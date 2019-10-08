@@ -53,7 +53,7 @@ variable "start_window" {
 
 variable "completion_window" {
   type        = number
-  description = "The amount of time AWS Backup attempts a backup before canceling the job and returning an error"
+  description = "The amount of time AWS Backup attempts a backup before canceling the job and returning an error. Must be at least 60 minutes greater than `start_window`"
 }
 
 variable "cold_storage_after" {

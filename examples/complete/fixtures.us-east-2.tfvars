@@ -12,7 +12,7 @@ schedule = "cron(0 12 * * ? *)"
 
 start_window = 60
 
-completion_window = 10
+completion_window = 120
 
 cold_storage_after = 30
 
