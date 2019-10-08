@@ -10,7 +10,7 @@ name = "backup"
 
 schedule = "cron(0 12 * * ? *)"
 
-start_window = 1
+start_window = 60
 
 completion_window = 10
 

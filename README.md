@@ -146,7 +146,7 @@ Available targets:
 | namespace | Namespace, which could be your organization name, e.g. 'eg' or 'cp' | string | `` | no |
 | schedule | A CRON expression specifying when AWS Backup initiates a backup job | string | `null` | no |
 | stage | Stage, e.g. 'prod', 'staging', 'dev', or 'test' | string | `` | no |
-| start_window | The amount of time in minutes before beginning a backup | number | `null` | no |
+| start_window | The amount of time in minutes before beginning a backup. Minimum value is 60 minutes | number | `null` | no |
 | tags | Additional tags (e.g. `map('BusinessUnit`,`XYZ`) | map(string) | `<map>` | no |
 
 ## Outputs

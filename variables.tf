@@ -53,7 +53,7 @@ variable "schedule" {
 
 variable "start_window" {
   type        = number
-  description = "The amount of time in minutes before beginning a backup"
+  description = "The amount of time in minutes before beginning a backup. Minimum value is 60 minutes"
   default     = null
 }
 
