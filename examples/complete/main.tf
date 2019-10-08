@@ -52,7 +52,7 @@ module "backup" {
   attributes         = var.attributes
   tags               = var.tags
   delimiter          = var.delimiter
-  backup_resource    = [module.efs.arn]
+  backup_resources   = [module.efs.arn]
   schedule           = var.schedule
   start_window       = var.start_window
   completion_window  = var.completion_window

@@ -77,5 +77,5 @@ resource "aws_backup_selection" "default" {
   name         = module.label.id
   iam_role_arn = join("", aws_iam_role.default.*.arn)
   plan_id      = join("", aws_backup_plan.default.*.id)
-  resources    = var.backup_resource
+  resources    = var.backup_resources
 }

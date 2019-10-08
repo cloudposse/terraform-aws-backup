@@ -106,7 +106,7 @@ module "backup" {
   attributes         = var.attributes
   tags               = var.tags
   delimiter          = var.delimiter
-  backup_resource    = [module.efs.arn]
+  backup_resources   = [module.efs.arn]
   schedule           = var.schedule
   start_window       = var.start_window
   completion_window  = var.completion_window
@@ -135,7 +135,7 @@ Available targets:
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | attributes | Additional attributes (e.g. `1`) | list(string) | `<list>` | no |
-| backup_resource | An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan | list(string) | - | yes |
+| backup_resources | An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan | list(string) | - | yes |
 | cold_storage_after | Specifies the number of days after creation that a recovery point is moved to cold storage | number | `null` | no |
 | completion_window | The amount of time AWS Backup attempts a backup before canceling the job and returning an error. Must be at least 60 minutes greater than `start_window` | number | `null` | no |
 | delete_after | Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after` | number | `null` | no |
