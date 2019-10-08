@@ -36,7 +36,7 @@ resource "aws_backup_plan" "default" {
     recovery_point_tags = module.label.tags
 
     dynamic "lifecycle" {
-      for_each = var.cold_storage_after != null || var.delete_after != null ? ["true"] : {}
+      for_each = var.cold_storage_after != null || var.delete_after != null ? ["true"] : []
       content {
         cold_storage_after = var.cold_storage_after
         delete_after       = var.delete_after
