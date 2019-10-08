@@ -74,8 +74,8 @@ description: |-
 # How to use this project
 usage: |-
 
-  For a complete example on how to backup an Elastic File System (EFS), see [examples/complete]((examples/complete
-  )
+  For a complete example on how to backup an Elastic File System (EFS), see [examples/complete](examples/complete).
+
   ```hcl
   provider "aws" {
     region = var.region
