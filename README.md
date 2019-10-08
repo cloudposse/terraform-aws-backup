@@ -49,8 +49,8 @@ Instead pin to the release tag (e.g. `?ref=tags/x.y.z`) of one of our [latest re
 
 
 
-For a complete example on how to backup an Elastic File System (EFS), see [examples/complete]((examples/complete
-)
+For a complete example on how to backup an Elastic File System (EFS), see [examples/complete](examples/complete).
+
 ```hcl
 provider "aws" {
   region = var.region
