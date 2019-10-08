@@ -45,7 +45,7 @@ func TestExamplesComplete(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	efsArn := terraform.Output(t, terraformOptions, "efs_arn")
 	// Verify we're getting back the outputs we expect
-	assert.Contains(t, efsArn, "arn:aws:elasticfilesystem:us-west-1:126450723953:file-system/")
+	assert.Contains(t, efsArn, "arn:aws:elasticfilesystem:us-east-2:126450723953:file-system")
 
 	// Run `terraform output` to get the value of an output variable
 	backupPlanArn := terraform.Output(t, terraformOptions, "backup_plan_arn")
