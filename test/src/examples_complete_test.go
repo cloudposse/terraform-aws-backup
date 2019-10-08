@@ -27,22 +27,18 @@ func TestExamplesComplete(t *testing.T) {
 
 	// Run `terraform output` to get the value of an output variable
 	vpcCidr := terraform.Output(t, terraformOptions, "vpc_cidr")
-
-	expectedVpcCidr := "172.16.0.0/16"
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, expectedVpcCidr, vpcCidr)
+	assert.Equal(t, "172.16.0.0/16", vpcCidr)
 
 	// Run `terraform output` to get the value of an output variable
 	privateSubnetCidrs := terraform.OutputList(t, terraformOptions, "private_subnet_cidrs")
-
-	expectedPrivateSubnetCidrs := []string{"172.16.0.0/18", "172.16.64.0/18"}
+	expectedPrivateSubnetCidrs := []string{"172.16.0.0/19", "172.16.32.0/19"}
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedPrivateSubnetCidrs, privateSubnetCidrs)
 
 	// Run `terraform output` to get the value of an output variable
 	publicSubnetCidrs := terraform.OutputList(t, terraformOptions, "public_subnet_cidrs")
-
-	expectedPublicSubnetCidrs := []string{"172.16.128.0/18", "172.16.192.0/18"}
+	expectedPublicSubnetCidrs := []string{"172.16.96.0/19", "172.16.128.0/19"}
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedPublicSubnetCidrs, publicSubnetCidrs)
 
@@ -50,4 +46,19 @@ func TestExamplesComplete(t *testing.T) {
 	efsArn := terraform.Output(t, terraformOptions, "efs_arn")
 	// Verify we're getting back the outputs we expect
 	assert.Contains(t, efsArn, "arn:aws:elasticfilesystem:us-west-1:126450723953:file-system/")
+
+	// Run `terraform output` to get the value of an output variable
+	backupPlanArn := terraform.Output(t, terraformOptions, "backup_plan_arn")
+	// Verify we're getting back the outputs we expect
+	assert.Contains(t, backupPlanArn, "arn:aws:backup:us-east-2:126450723953:backup-plan")
+
+	// Run `terraform output` to get the value of an output variable
+	backupVaultArn := terraform.Output(t, terraformOptions, "backup_vault_arn")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "arn:aws:backup:us-east-2:126450723953:backup-vault:eg-test-backup", backupVaultArn)
+
+	// Run `terraform output` to get the value of an output variable
+	backupVaultId := terraform.Output(t, terraformOptions, "backup_vault_id")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "eg-test-backup", backupVaultId)
 }
