@@ -302,16 +302,13 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
 
   [osterman_homepage]: https://github.com/osterman
-  [osterman_avatar]: http://s.gravatar.com/avatar/88c480d4f73b813904e00a5695a454cb?s=144
-
+  [osterman_avatar]: https://img.cloudposse.com/150x150/https://github.com/osterman.png
 
   [aknysh_homepage]: https://github.com/aknysh/
-  [aknysh_avatar]: https://avatars0.githubusercontent.com/u/7356997?v=4&u=ed9ce1c9151d552d985bdf5546772e14ef7ab617&s=144
-
+  [aknysh_avatar]: https://img.cloudposse.com/150x150/https://github.com/aknysh.png
 
   [goruha_homepage]: https://github.com/goruha/
-  [goruha_avatar]: http://s.gravatar.com/avatar/bc70834d32ed4517568a1feb0b9be7e2?s=144
-
+  [goruha_avatar]: https://img.cloudposse.com/150x150/https://github.com/goruha.png
 
 
 
