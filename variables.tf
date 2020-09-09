@@ -1,44 +1,3 @@
-variable "enabled" {
-  type        = bool
-  description = "Set to false to prevent the module from creating any resources"
-  default     = true
-}
-
-variable "namespace" {
-  type        = string
-  description = "Namespace, which could be your organization name, e.g. 'eg' or 'cp'"
-  default     = ""
-}
-
-variable "stage" {
-  type        = string
-  description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-  default     = ""
-}
-
-variable "name" {
-  type        = string
-  description = "Solution name, e.g. 'app' or 'cluster'"
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `name`, `namespace`, `stage`, etc."
-}
-
-variable "attributes" {
-  type        = list(string)
-  default     = []
-  description = "Additional attributes (e.g. `1`)"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit`,`XYZ`)"
-}
-
 variable "kms_key_arn" {
   type        = string
   description = "The server-side encryption key that is used to protect your backups"
@@ -78,4 +37,22 @@ variable "delete_after" {
 variable "backup_resources" {
   type        = list(string)
   description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan"
+}
+
+variable "destination_vault_arn" {
+  type        = string
+  description = "An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup"
+  default     = null
+}
+
+variable "copy_action_cold_storage_after" {
+  type        = number
+  description = "For copy operation, specifies the number of days after creation that a recovery point is moved to cold storage"
+  default     = null
+}
+
+variable "copy_action_delete_after" {
+  type        = number
+  description = "For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after`"
+  default     = null
 }
