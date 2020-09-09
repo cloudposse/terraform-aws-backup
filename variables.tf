@@ -38,3 +38,21 @@ variable "backup_resources" {
   type        = list(string)
   description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan"
 }
+
+variable "destination_vault_arn" {
+  type        = string
+  description = "An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup"
+  default     = null
+}
+
+variable "copy_action_cold_storage_after" {
+  type        = number
+  description = "For copy operation, specifies the number of days after creation that a recovery point is moved to cold storage"
+  default     = null
+}
+
+variable "copy_action_delete_after" {
+  type        = number
+  description = "For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after`"
+  default     = null
+}

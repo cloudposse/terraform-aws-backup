@@ -31,7 +31,24 @@ resource "aws_backup_plan" "default" {
         delete_after       = var.delete_after
       }
     }
+
+    dynamic "copy_action" {
+      for_each = var.destination_vault_arn != null ? ["true"] : []
+      content {
+        destination_vault_arn = var.destination_vault_arn
+
+        dynamic "lifecycle" {
+          for_each = var.copy_action_cold_storage_after != null || var.copy_action_delete_after != null ? ["true"] : []
+          content {
+            cold_storage_after = var.copy_action_cold_storage_after
+            delete_after       = var.copy_action_delete_after
+          }
+        }
+      }
+    }
   }
+
+  tags = module.this.tags
 }
 
 data "aws_iam_policy_document" "assume_role" {
