@@ -3,8 +3,8 @@ module "label_backup_role" {
   version    = "0.22.1"
   enabled    = module.this.enabled
   attributes = ["backup"]
-    
-  context    = module.this.context
+
+  context = module.this.context
 }
 
 resource "aws_backup_vault" "default" {
