@@ -1,9 +1,10 @@
 module "label_backup_role" {
   source     = "cloudposse/label/null"
-  version    = "0.19.2"
+  version    = "0.22.1"
   enabled    = module.this.enabled
+  attributes = "backup"
+    
   context    = module.this.context
-  attributes = compact(concat(module.this.attributes, list("backup")))
 }
 
 resource "aws_backup_vault" "default" {
