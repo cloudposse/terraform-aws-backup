@@ -2,7 +2,7 @@ module "label_backup_role" {
   source     = "cloudposse/label/null"
   version    = "0.22.1"
   enabled    = module.this.enabled
-  attributes = "backup"
+  attributes = ["backup"]
     
   context    = module.this.context
 }
