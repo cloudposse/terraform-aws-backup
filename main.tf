@@ -1,8 +1,10 @@
 module "label_backup_role" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.19.2"
+  source     = "cloudposse/label/null"
+  version    = "0.22.1"
   enabled    = module.this.enabled
-  context    = module.this.context
-  attributes = compact(concat(module.this.attributes, list("backup")))
+  attributes = ["backup"]
+
+  context = module.this.context
 }
 
 resource "aws_backup_vault" "default" {
