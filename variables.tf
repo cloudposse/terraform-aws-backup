@@ -37,6 +37,17 @@ variable "delete_after" {
 variable "backup_resources" {
   type        = list(string)
   description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan"
+  default     = []
+}
+
+variable "selection_tags" {
+  type = list(object({
+    type  = string
+    key   = string
+    value = string
+  }))
+  description = "An array of tag condition objects used to filter resources based on tags for assigning to a backup plan"
+  default     = []
 }
 
 variable "destination_vault_arn" {

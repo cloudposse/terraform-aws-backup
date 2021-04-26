@@ -86,4 +86,12 @@ resource "aws_backup_selection" "default" {
   iam_role_arn = join("", aws_iam_role.default.*.arn)
   plan_id      = join("", aws_backup_plan.default.*.id)
   resources    = var.backup_resources
+  dynamic "selection_tag" {
+    for_each = var.selection_tags
+    content {
+      type  = selection_tag.value["type"]
+      key   = selection_tag.value["key"]
+      value = selection_tag.value["value"]
+    }
+  }
 }
