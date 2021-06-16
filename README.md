@@ -245,15 +245,15 @@ Available targets:
 | <a name="input_name"></a> [name](#input\_name) | Solution name, e.g. 'app' or 'jenkins' | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp' | `string` | `null` | no |
 | <a name="input_plan_enabled"></a> [plan\_enabled](#input\_plan\_enabled) | Should we create a new Plan | `bool` | `true` | no |
-| <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `""` | no |
+| <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Regex to replace chars with empty string in `namespace`, `environment`, `stage` and `name`.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_schedule"></a> [schedule](#input\_schedule) | A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br>    type  = string<br>    key   = string<br>    value = string<br>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | Stage, e.g. 'prod', 'staging', 'dev', OR 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | <a name="input_start_window"></a> [start\_window](#input\_start\_window) | The amount of time in minutes before beginning a backup. Minimum value is 60 minutes | `number` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
-| <a name="input_target_iam_role_name"></a> [target\_iam\_role\_name](#input\_target\_iam\_role\_name) | Override target IAM Name | `string` | `""` | no |
-| <a name="input_target_vault_name"></a> [target\_vault\_name](#input\_target\_vault\_name) | Override target Vault Name | `string` | `""` | no |
+| <a name="input_target_iam_role_name"></a> [target\_iam\_role\_name](#input\_target\_iam\_role\_name) | Override target IAM Name | `string` | `null` | no |
+| <a name="input_target_vault_name"></a> [target\_vault\_name](#input\_target\_vault\_name) | Override target Vault Name | `string` | `null` | no |
 | <a name="input_vault_enabled"></a> [vault\_enabled](#input\_vault\_enabled) | Should we create a new Vault | `bool` | `true` | no |
 
 ## Outputs
