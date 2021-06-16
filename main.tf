@@ -8,7 +8,7 @@ module "label_backup_role" {
 }
 
 resource "aws_backup_vault" "default" {
-  count       = module.this.enabled && var.vault_enabled? 1 : 0
+  count       = module.this.enabled && var.vault_enabled ? 1 : 0
   name        = module.this.id
   kms_key_arn = var.kms_key_arn
   tags        = module.this.tags
@@ -75,8 +75,8 @@ resource "aws_iam_role" "default" {
 }
 
 data "aws_iam_role" "existing" {
-  count              = module.this.enabled && var.iam_enabled ? 0 : 1
-  name = module.label_backup_role.id
+  count = module.this.enabled && var.iam_enabled ? 0 : 1
+  name  = module.label_backup_role.id
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
