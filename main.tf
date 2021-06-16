@@ -1,3 +1,7 @@
+locals {
+  module_and_iam_role_enabled = module.this.enabled && var.iam_role_enabled
+}
+
 module "label_backup_role" {
   source     = "cloudposse/label/null"
   version    = "0.24.1"
@@ -68,19 +72,19 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "default" {
-  count              = module.this.enabled && var.iam_role_enabled ? 1 : 0
+  count              = local.module_and_iam_role_enabled ? 1 : 0
   name               = var.target_iam_role_name == "" ? module.label_backup_role.id : var.target_iam_role_name
   assume_role_policy = join("", data.aws_iam_policy_document.assume_role.*.json)
   tags               = module.label_backup_role.tags
 }
 
 data "aws_iam_role" "existing" {
-  count = module.this.enabled && var.iam_enabled ? 0 : 1
+  count = local.module_and_iam_role_enabled ? 0 : 1
   name  = module.label_backup_role.id
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  count      = module.this.enabled && var.iam_enabled ? 1 : 0
+  count      = local.module_and_iam_role_enabled ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
   role       = join("", aws_iam_role.default.*.name)
 }
@@ -88,7 +92,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 resource "aws_backup_selection" "default" {
   count        = module.this.enabled ? 1 : 0
   name         = module.this.id
-  iam_role_arn = join("", var.iam_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
+  iam_role_arn = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
   plan_id      = join("", aws_backup_plan.default.*.id)
   resources    = var.backup_resources
   dynamic "selection_tag" {
