@@ -68,8 +68,8 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "default" {
-  count              = module.this.enabled && var.iam_enabled ? 1 : 0
-  name               = var.target_iam_name == "" ? module.label_backup_role.id : var.target_iam_name
+  count              = module.this.enabled && var.iam_role_enabled ? 1 : 0
+  name               = var.target_iam_role_name == "" ? module.label_backup_role.id : var.target_iam_role_name
   assume_role_policy = join("", data.aws_iam_policy_document.assume_role.*.json)
   tags               = module.label_backup_role.tags
 }

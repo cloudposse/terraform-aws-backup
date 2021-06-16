@@ -92,13 +92,13 @@ variable "plan_enabled" {
   default     = true
 }
 
-variable "iam_enabled" {
+variable "iam_role_enabled" {
   type        = bool
   description = "Should we create a new Iam Role and Policy Attachment"
   default     = true
 }
 
-variable "target_iam_name" {
+variable "target_iam_role_name" {
   type        = string
   description = "Override target IAM Name"
   default     = ""
