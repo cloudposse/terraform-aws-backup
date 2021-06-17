@@ -20,11 +20,11 @@ resource "aws_backup_vault" "default" {
 
 resource "aws_backup_plan" "default" {
   count = module.this.enabled && var.plan_enabled ? 1 : 0
-  name  = var.plan_name_suffix == "" ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
+  name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   rule {
     rule_name           = module.this.id
-    target_vault_name   = var.target_vault_name == "" ? join("", aws_backup_vault.default.*.name) : var.target_vault_name
+    target_vault_name   = var.target_vault_name == null ? join("", aws_backup_vault.default.*.name) : var.target_vault_name
     schedule            = var.schedule
     start_window        = var.start_window
     completion_window   = var.completion_window
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "assume_role" {
 
 resource "aws_iam_role" "default" {
   count              = local.module_and_iam_role_enabled ? 1 : 0
-  name               = var.target_iam_role_name == "" ? module.label_backup_role.id : var.target_iam_role_name
+  name               = var.target_iam_role_name == null ? module.label_backup_role.id : var.target_iam_role_name
   assume_role_policy = join("", data.aws_iam_policy_document.assume_role.*.json)
   tags               = module.label_backup_role.tags
 }

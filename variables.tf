@@ -100,6 +100,6 @@ variable "iam_role_enabled" {
 
 variable "target_iam_role_name" {
   type        = string
-  description = "Override target IAM Name"
+  description = "Override target IAM Role Name"
   default     = null
 }
