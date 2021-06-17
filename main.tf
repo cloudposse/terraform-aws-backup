@@ -1,5 +1,6 @@
 locals {
   module_and_iam_role_enabled = module.this.enabled && var.iam_role_enabled
+  module_and_plan_enabled     = module.this.enabled && var.plan_enabled
 }
 
 module "label_backup_role" {
@@ -90,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 }
 
 resource "aws_backup_selection" "default" {
-  count        = module.this.enabled ? 1 : 0
+  count        = local.module_and_plan_enabled ? 1 : 0
   name         = module.this.id
   iam_role_arn = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
   plan_id      = join("", aws_backup_plan.default.*.id)
