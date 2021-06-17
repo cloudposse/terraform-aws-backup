@@ -252,7 +252,7 @@ Available targets:
 | <a name="input_stage"></a> [stage](#input\_stage) | Stage, e.g. 'prod', 'staging', 'dev', OR 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | <a name="input_start_window"></a> [start\_window](#input\_start\_window) | The amount of time in minutes before beginning a backup. Minimum value is 60 minutes | `number` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
-| <a name="input_target_iam_role_name"></a> [target\_iam\_role\_name](#input\_target\_iam\_role\_name) | Override target IAM Name | `string` | `null` | no |
+| <a name="input_target_iam_role_name"></a> [target\_iam\_role\_name](#input\_target\_iam\_role\_name) | Override target IAM Role Name | `string` | `null` | no |
 | <a name="input_target_vault_name"></a> [target\_vault\_name](#input\_target\_vault\_name) | Override target Vault Name | `string` | `null` | no |
 | <a name="input_vault_enabled"></a> [vault\_enabled](#input\_vault\_enabled) | Should we create a new Vault | `bool` | `true` | no |
 
