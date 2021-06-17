@@ -67,3 +67,39 @@ variable "copy_action_delete_after" {
   description = "For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after`"
   default     = null
 }
+
+variable "plan_name_suffix" {
+  type        = string
+  description = "The string appended to the plan name"
+  default     = null
+}
+
+variable "target_vault_name" {
+  type        = string
+  description = "Override target Vault Name"
+  default     = null
+}
+
+variable "vault_enabled" {
+  type        = bool
+  description = "Should we create a new Vault"
+  default     = true
+}
+
+variable "plan_enabled" {
+  type        = bool
+  description = "Should we create a new Plan"
+  default     = true
+}
+
+variable "iam_role_enabled" {
+  type        = bool
+  description = "Should we create a new Iam Role and Policy Attachment"
+  default     = true
+}
+
+variable "target_iam_role_name" {
+  type        = string
+  description = "Override target IAM Role Name"
+  default     = null
+}
