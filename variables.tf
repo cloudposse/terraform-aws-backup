@@ -103,3 +103,9 @@ variable "target_iam_role_name" {
   description = "Override target IAM Role Name"
   default     = null
 }
+
+variable "enable_continuous_backup" {
+  type        = bool
+  description = "Enable continuous backups for supported resources."
+  default     = null
+}
