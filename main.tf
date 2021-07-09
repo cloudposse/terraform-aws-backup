@@ -26,12 +26,13 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   rule {
-    rule_name           = module.this.id
-    target_vault_name   = var.target_vault_name == null ? join("", aws_backup_vault.default.*.name) : var.target_vault_name
-    schedule            = var.schedule
-    start_window        = var.start_window
-    completion_window   = var.completion_window
-    recovery_point_tags = module.this.tags
+    rule_name                = module.this.id
+    target_vault_name        = var.target_vault_name == null ? join("", aws_backup_vault.default.*.name) : var.target_vault_name
+    schedule                 = var.schedule
+    start_window             = var.start_window
+    completion_window        = var.completion_window
+    recovery_point_tags      = module.this.tags
+    enable_continuous_backup = var.enable_continuous_backup
 
     dynamic "lifecycle" {
       for_each = var.cold_storage_after != null || var.delete_after != null ? ["true"] : []
