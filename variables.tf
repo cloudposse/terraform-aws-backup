@@ -107,5 +107,5 @@ variable "target_iam_role_name" {
 variable "enable_continuous_backup" {
   type        = bool
   description = "Enable continuous backups for supported resources."
-  default     = false
+  default     = null
 }
