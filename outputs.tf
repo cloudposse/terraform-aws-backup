@@ -8,11 +8,6 @@ output "backup_vault_arn" {
   description = "Backup Vault ARN"
 }
 
-output "backup_vault_recovery_points" {
-  value       = join("", aws_backup_vault.default.*.recovery_points)
-  description = "Backup Vault recovery points"
-}
-
 output "backup_plan_arn" {
   value       = join("", aws_backup_plan.default.*.arn)
   description = "Backup Plan ARN"
