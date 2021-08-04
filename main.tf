@@ -32,7 +32,7 @@ resource "aws_backup_plan" "default" {
 
   rule {
     rule_name                = module.this.id
-    target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_iam_role.existing.*.name)
+    target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
     schedule                 = var.schedule
     start_window             = var.start_window
     completion_window        = var.completion_window
