@@ -20,7 +20,7 @@ resource "aws_backup_vault" "default" {
   kms_key_arn = var.kms_key_arn
   tags        = module.this.tags
 }
-    
+
 data "aws_backup_vault" "existing" {
   count = local.enabled && var.vault_enabled == false ? 1 : 0
   name  = var.target_vault_name == null ? module.this.id : var.target_vault_name
