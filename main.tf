@@ -21,13 +21,18 @@ resource "aws_backup_vault" "default" {
   tags        = module.this.tags
 }
 
+data "aws_backup_vault" "existing" {
+  count = local.enabled && var.vault_enabled == false ? 1 : 0
+  name  = var.target_vault_name == null ? module.this.id : var.target_vault_name
+}
+
 resource "aws_backup_plan" "default" {
   count = local.plan_enabled ? 1 : 0
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   rule {
     rule_name                = module.this.id
-    target_vault_name        = var.target_vault_name == null ? join("", aws_backup_vault.default.*.name) : var.target_vault_name
+    target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
     schedule                 = var.schedule
     start_window             = var.start_window
     completion_window        = var.completion_window
