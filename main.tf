@@ -84,7 +84,7 @@ resource "aws_iam_role" "default" {
 
 data "aws_iam_role" "existing" {
   count = local.enabled && var.iam_role_enabled == false ? 1 : 0
-  name  = module.label_backup_role.id
+  name  = var.target_iam_role_name == null ? module.label_backup_role.id : var.target_iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
