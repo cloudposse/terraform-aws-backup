@@ -5,6 +5,8 @@ locals {
   vault_enabled    = local.enabled && var.vault_enabled
 }
 
+data "aws_partition" "current" {}
+
 module "label_backup_role" {
   source     = "cloudposse/label/null"
   version    = "0.24.1"
@@ -89,7 +91,7 @@ data "aws_iam_role" "existing" {
 
 resource "aws_iam_role_policy_attachment" "default" {
   count      = local.iam_role_enabled ? 1 : 0
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
   role       = join("", aws_iam_role.default.*.name)
 }
 
