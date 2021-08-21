@@ -204,7 +204,7 @@ Available targets:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_label_backup_role"></a> [label\_backup\_role](#module\_label\_backup\_role) | cloudposse/label/null | 0.24.1 |
+| <a name="module_label_backup_role"></a> [label\_backup\_role](#module\_label\_backup\_role) | cloudposse/label/null | 0.25.0 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 
 ## Resources
