@@ -9,7 +9,7 @@ data "aws_partition" "current" {}
 
 module "label_backup_role" {
   source     = "cloudposse/label/null"
-  version    = "0.24.1"
+  version    = "0.25.0"
   enabled    = local.enabled
   attributes = ["backup"]
 
