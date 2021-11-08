@@ -1,10 +1,10 @@
 output "backup_vault_id" {
-  value       = join("", aws_backup_vault.default.*.id)
+  value       = local.vault_id
   description = "Backup Vault ID"
 }
 
 output "backup_vault_arn" {
-  value       = join("", aws_backup_vault.default.*.arn)
+  value       = local.vault_arn
   description = "Backup Vault ARN"
 }
 

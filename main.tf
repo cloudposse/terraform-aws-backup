@@ -1,8 +1,12 @@
 locals {
   enabled          = module.this.enabled
-  iam_role_enabled = local.enabled && var.iam_role_enabled
   plan_enabled     = local.enabled && var.plan_enabled
+  iam_role_enabled = local.enabled && var.iam_role_enabled
+  iam_role_name    = coalesce(var.iam_role_name, module.label_backup_role.id)
   vault_enabled    = local.enabled && var.vault_enabled
+  vault_name       = coalesce(var.vault_name, module.this.id)
+  vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
+  vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default.*.arn : data.aws_backup_vault.existing.*.arn)
 }
 
 data "aws_partition" "current" {}
@@ -18,14 +22,14 @@ module "label_backup_role" {
 
 resource "aws_backup_vault" "default" {
   count       = local.vault_enabled ? 1 : 0
-  name        = module.this.id
+  name        = local.vault_name
   kms_key_arn = var.kms_key_arn
   tags        = module.this.tags
 }
 
 data "aws_backup_vault" "existing" {
   count = local.enabled && var.vault_enabled == false ? 1 : 0
-  name  = var.target_vault_name == null ? module.this.id : var.target_vault_name
+  name  = local.vault_name
 }
 
 resource "aws_backup_plan" "default" {
@@ -84,14 +88,14 @@ data "aws_iam_policy_document" "assume_role" {
 
 resource "aws_iam_role" "default" {
   count              = local.iam_role_enabled ? 1 : 0
-  name               = var.target_iam_role_name == null ? module.label_backup_role.id : var.target_iam_role_name
+  name               = local.iam_role_name
   assume_role_policy = join("", data.aws_iam_policy_document.assume_role.*.json)
   tags               = module.label_backup_role.tags
 }
 
 data "aws_iam_role" "existing" {
   count = local.enabled && var.iam_role_enabled == false ? 1 : 0
-  name  = var.target_iam_role_name == null ? module.label_backup_role.id : var.target_iam_role_name
+  name  = local.iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
