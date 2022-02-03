@@ -105,11 +105,12 @@ resource "aws_iam_role_policy_attachment" "default" {
 }
 
 resource "aws_backup_selection" "default" {
-  count        = local.plan_enabled ? 1 : 0
-  name         = module.this.id
-  iam_role_arn = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
-  plan_id      = join("", aws_backup_plan.default.*.id)
-  resources    = var.backup_resources
+  count         = local.plan_enabled ? 1 : 0
+  name          = module.this.id
+  iam_role_arn  = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
+  plan_id       = join("", aws_backup_plan.default.*.id)
+  resources     = var.backup_resources
+  not_resources = var.not_resources
   dynamic "selection_tag" {
     for_each = var.selection_tags
     content {

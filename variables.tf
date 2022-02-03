@@ -40,6 +40,12 @@ variable "backup_resources" {
   default     = []
 }
 
+variable "not_resources" {
+  type        = list(string)
+  description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to exclude from a backup plan"
+  default     = []
+}
+
 variable "selection_tags" {
   type = list(object({
     type  = string

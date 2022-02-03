@@ -41,6 +41,7 @@ module "backup" {
   source = "../.."
 
   backup_resources   = [module.efs.arn]
+  not_resources      = var.not_resources
   schedule           = var.schedule
   start_window       = var.start_window
   completion_window  = var.completion_window
