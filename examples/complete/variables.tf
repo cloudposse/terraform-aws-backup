@@ -8,6 +8,12 @@ variable "availability_zones" {
   description = "List of Availability Zones"
 }
 
+variable "not_resources" {
+  type        = list(string)
+  description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to exclude from a backup plan"
+  default     = []
+}
+
 variable "schedule" {
   type        = string
   description = "A CRON expression specifying when AWS Backup initiates a backup job"
