@@ -104,6 +104,12 @@ resource "aws_iam_role_policy_attachment" "default" {
   role       = join("", aws_iam_role.default.*.name)
 }
 
+resource "aws_iam_role_policy_attachment" "s3" {
+  count      = local.iam_role_enabled ? 1 : 0
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSBackupServiceRolePolicyForS3Backup"
+  role       = join("", aws_iam_role.default.*.name)
+}
+
 resource "aws_backup_selection" "default" {
   count         = local.plan_enabled ? 1 : 0
   name          = module.this.id
