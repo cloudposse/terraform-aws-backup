@@ -37,33 +37,36 @@ resource "aws_backup_plan" "default" {
   count = local.plan_enabled ? 1 : 0
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
-  rule {
-    rule_name                = module.this.id
-    target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
-    schedule                 = var.schedule
-    start_window             = var.start_window
-    completion_window        = var.completion_window
-    recovery_point_tags      = module.this.tags
-    enable_continuous_backup = var.enable_continuous_backup
+  dynamic "rule" {
+    for_each = length(var.rules) > 0 ? var.rules : [{ name = module.this.id }]
+    content {
+      rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
+      target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
+      schedule                 = lookup(rule.value, "schedule", var.schedule)
+      start_window             = lookup(rule.value, "start_window", var.start_window)
+      completion_window        = lookup(rule.value, "completion_window", var.completion_window)
+      recovery_point_tags      = module.this.tags
+      enable_continuous_backup = lookup(rule.value, "enable_continuous_backup", var.enable_continuous_backup)
 
-    dynamic "lifecycle" {
-      for_each = var.cold_storage_after != null || var.delete_after != null ? ["true"] : []
-      content {
-        cold_storage_after = var.cold_storage_after
-        delete_after       = var.delete_after
+      dynamic "lifecycle" {
+        for_each = lookup(rule.value, "cold_storage_after", var.cold_storage_after) != null || lookup(rule.value, "delete_after", var.delete_after) != null ? ["true"] : []
+        content {
+          cold_storage_after = lookup(rule.value, "cold_storage_after", var.cold_storage_after)
+          delete_after       = lookup(rule.value, "delete_after", var.delete_after)
+        }
       }
-    }
 
-    dynamic "copy_action" {
-      for_each = var.destination_vault_arn != null ? ["true"] : []
-      content {
-        destination_vault_arn = var.destination_vault_arn
+      dynamic "copy_action" {
+        for_each = lookup(rule.value, "destination_vault_arn", var.destination_vault_arn) != null ? ["true"] : []
+        content {
+          destination_vault_arn = lookup(rule.value, "destination_vault_arn", var.destination_vault_arn)
 
-        dynamic "lifecycle" {
-          for_each = var.copy_action_cold_storage_after != null || var.copy_action_delete_after != null ? ["true"] : []
-          content {
-            cold_storage_after = var.copy_action_cold_storage_after
-            delete_after       = var.copy_action_delete_after
+          dynamic "lifecycle" {
+            for_each = lookup(rule.value, "copy_action_cold_storage_after", var.copy_action_cold_storage_after) != null || lookup(rule.value, "copy_action_delete_after", var.copy_action_delete_after) != null ? ["true"] : []
+            content {
+              cold_storage_after = lookup(rule.value, "copy_action_cold_storage_after", var.copy_action_cold_storage_after)
+              delete_after       = lookup(rule.value, "copy_action_delete_after", var.copy_action_delete_after)
+            }
           }
         }
       }

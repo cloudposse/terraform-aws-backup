@@ -4,6 +4,12 @@ variable "kms_key_arn" {
   default     = null
 }
 
+variable "rules" {
+  type        = list(map(string))
+  description = "An array of rule maps used to define schedules in a backup plan"
+  default     = []
+}
+
 variable "schedule" {
   type        = string
   description = "A CRON expression specifying when AWS Backup initiates a backup job"
