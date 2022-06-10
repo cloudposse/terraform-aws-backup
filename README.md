@@ -160,11 +160,14 @@ module "backup" {
   delimiter          = var.delimiter
   backup_resources   = [module.efs.arn]
   not_resources      = var.not_resources
-  schedule           = var.schedule
-  start_window       = var.start_window
-  completion_window  = var.completion_window
-  cold_storage_after = var.cold_storage_after
-  delete_after       = var.delete_after
+  rules = [{
+    name               = var.name
+    schedule           = var.schedule
+    start_window       = var.start_window
+    completion_window  = var.completion_window
+    cold_storage_after = var.cold_storage_after
+    delete_after       = var.delete_after
+  }]
 }
 ```
 
@@ -197,7 +200,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.18.0 |
 
 ## Modules
 
@@ -254,6 +257,7 @@ Available targets:
 | <a name="input_plan_enabled"></a> [plan\_enabled](#input\_plan\_enabled) | Should we create a new Plan | `bool` | `true` | no |
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br>Characters matching the regex will be removed from the ID elements.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
+| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `list(map(string))` | `[]` | no |
 | <a name="input_schedule"></a> [schedule](#input\_schedule) | A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br>    type  = string<br>    key   = string<br>    value = string<br>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
