@@ -22,3 +22,18 @@ output "backup_selection_id" {
   value       = join("", aws_backup_selection.default.*.id)
   description = "Backup Selection ID"
 }
+
+output "backup_selection_id" {
+  value       = join("", aws_backup_selection.default.*.id)
+  description = "Backup Selection ID"
+}
+
+output "role_name" {
+  value       = local.iam_role_name
+  description = "The name of the IAM role created"
+}
+
+output "role_arn" {
+  value       = local.iam_role_arn
+  description = "The Amazon Resource Name (ARN) specifying the role"
+}
