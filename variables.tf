@@ -115,3 +115,9 @@ variable "enable_continuous_backup" {
   description = "Enable continuous backups for supported resources."
   default     = null
 }
+
+variable "permissions_boundary" {
+  type        = string
+  default     = null
+  description = "The permissions boundary to set on the role"
+}
