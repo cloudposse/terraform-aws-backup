@@ -3,6 +3,7 @@ locals {
   plan_enabled     = local.enabled && var.plan_enabled
   iam_role_enabled = local.enabled && var.iam_role_enabled
   iam_role_name    = coalesce(var.iam_role_name, module.label_backup_role.id)
+  iam_role_arn     = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
   vault_enabled    = local.enabled && var.vault_enabled
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
@@ -108,7 +109,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 resource "aws_backup_selection" "default" {
   count         = local.plan_enabled ? 1 : 0
   name          = module.this.id
-  iam_role_arn  = join("", var.iam_role_enabled ? aws_iam_role.default.*.arn : data.aws_iam_role.existing.*.arn)
+  iam_role_arn  = local.iam_role_arn
   plan_id       = join("", aws_backup_plan.default.*.id)
   resources     = var.backup_resources
   not_resources = var.not_resources
