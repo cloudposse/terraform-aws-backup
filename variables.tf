@@ -56,9 +56,9 @@ variable "selection_tags" {
   default     = []
 }
 
-variable "destination_vault_arn" {
-  type        = string
-  description = "An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup"
+variable "destination_vault_arns" {
+  type        = list
+  description = " List of Amazon Resource Names (ARNs) that uniquely identifies the destination backup vaults for the copied backup"
   default     = null
 }
 

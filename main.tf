@@ -55,9 +55,9 @@ resource "aws_backup_plan" "default" {
     }
 
     dynamic "copy_action" {
-      for_each = var.destination_vault_arn != null ? ["true"] : []
+      for_each = var.destination_vault_arns != null ? toset(var.destination_vault_arns) : toset([])
       content {
-        destination_vault_arn = var.destination_vault_arn
+        destination_vault_arn = copy_action.key
 
         dynamic "lifecycle" {
           for_each = var.copy_action_cold_storage_after != null || var.copy_action_delete_after != null ? ["true"] : []
