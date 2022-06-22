@@ -55,7 +55,7 @@ resource "aws_backup_plan" "default" {
     }
 
     dynamic "copy_action" {
-      for_each = var.destination_vault_arns != null ? toset(var.destination_vault_arns) : toset([])
+      for_each = var.destination_vault_arns != null ? toset(var.destination_vault_arns) : []
       content {
         destination_vault_arn = copy_action.key
 
