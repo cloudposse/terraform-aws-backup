@@ -5,39 +5,9 @@ variable "kms_key_arn" {
 }
 
 variable "rules" {
-  type        = list(map(string))
+  type        = list(map(any))
   description = "An array of rule maps used to define schedules in a backup plan"
   default     = []
-}
-
-variable "schedule" {
-  type        = string
-  description = "A CRON expression specifying when AWS Backup initiates a backup job"
-  default     = null
-}
-
-variable "start_window" {
-  type        = number
-  description = "The amount of time in minutes before beginning a backup. Minimum value is 60 minutes"
-  default     = null
-}
-
-variable "completion_window" {
-  type        = number
-  description = "The amount of time AWS Backup attempts a backup before canceling the job and returning an error. Must be at least 60 minutes greater than `start_window`"
-  default     = null
-}
-
-variable "cold_storage_after" {
-  type        = number
-  description = "Specifies the number of days after creation that a recovery point is moved to cold storage"
-  default     = null
-}
-
-variable "delete_after" {
-  type        = number
-  description = "Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after`"
-  default     = null
 }
 
 variable "backup_resources" {
@@ -60,24 +30,6 @@ variable "selection_tags" {
   }))
   description = "An array of tag condition objects used to filter resources based on tags for assigning to a backup plan"
   default     = []
-}
-
-variable "destination_vault_arn" {
-  type        = string
-  description = "An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup"
-  default     = null
-}
-
-variable "copy_action_cold_storage_after" {
-  type        = number
-  description = "For copy operation, specifies the number of days after creation that a recovery point is moved to cold storage"
-  default     = null
-}
-
-variable "copy_action_delete_after" {
-  type        = number
-  description = "For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after`"
-  default     = null
 }
 
 variable "plan_name_suffix" {
@@ -113,12 +65,6 @@ variable "iam_role_enabled" {
 variable "iam_role_name" {
   type        = string
   description = "Override target IAM Role Name"
-  default     = null
-}
-
-variable "enable_continuous_backup" {
-  type        = bool
-  description = "Enable continuous backups for supported resources."
   default     = null
 }
 

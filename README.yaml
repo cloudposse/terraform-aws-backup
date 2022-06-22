@@ -60,6 +60,8 @@ description: |-
   Terraform module to provision [AWS Backup](https://aws.amazon.com/backup), a fully managed backup service that makes it easy to centralize and automate
   the back up of data across AWS services such as Amazon EBS volumes, Amazon EC2 instances, Amazon RDS databases, Amazon DynamoDB tables,
   Amazon EFS file systems, and AWS Storage Gateway volumes.
+
+  **NOTE**: the syntax of declaring a backup schedule has changed as of release 0.14.0, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
 # How to use this project
 usage: |2-
 
