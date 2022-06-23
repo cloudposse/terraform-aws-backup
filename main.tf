@@ -8,6 +8,24 @@ locals {
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default.*.arn : data.aws_backup_vault.existing.*.arn)
+  compat_rule = {
+    rule_name                = module.this.id
+    schedule                 = var.schedule
+    start_window             = var.start_window
+    completion_window        = var.completion_window
+    enable_continuous_backup = var.enable_continuous_backup
+    lifecycle = {
+      cold_storage_after = var.cold_storage_after
+      delete_after       = var.delete_after
+    }
+    copy_action = {
+      destination_vault_arn = var.destination_vault_arn
+      lifecycle = {
+        cold_storage_after = var.copy_action_cold_storage_after
+        delete_after       = var.copy_action_delete_after
+      }
+    }
+  }
 }
 
 data "aws_partition" "current" {}
@@ -37,33 +55,37 @@ resource "aws_backup_plan" "default" {
   count = local.plan_enabled ? 1 : 0
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
-  rule {
-    rule_name                = module.this.id
-    target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
-    schedule                 = var.schedule
-    start_window             = var.start_window
-    completion_window        = var.completion_window
-    recovery_point_tags      = module.this.tags
-    enable_continuous_backup = var.enable_continuous_backup
+  dynamic "rule" {
+    for_each = length(var.rules) > 0 ? var.rules : tolist(local.compat_rule)
 
-    dynamic "lifecycle" {
-      for_each = var.cold_storage_after != null || var.delete_after != null ? ["true"] : []
-      content {
-        cold_storage_after = var.cold_storage_after
-        delete_after       = var.delete_after
+    content {
+      rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
+      target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
+      schedule                 = lookup(rule.value, "schedule", null)
+      start_window             = lookup(rule.value, "start_window", null)
+      completion_window        = lookup(rule.value, "completion_window", null)
+      recovery_point_tags      = module.this.tags
+      enable_continuous_backup = lookup(rule.value, "enable_continuous_backup", null)
+
+      dynamic "lifecycle" {
+        for_each = lookup(rule.value, "cold_storage_after", null) != null || lookup(rule.value, "delete_after", null) != null ? ["true"] : []
+        content {
+          cold_storage_after = lookup(rule.value, "cold_storage_after", null)
+          delete_after       = lookup(rule.value, "delete_after", null)
+        }
       }
-    }
 
-    dynamic "copy_action" {
-      for_each = var.destination_vault_arns != null ? toset(var.destination_vault_arns) : []
-      content {
-        destination_vault_arn = copy_action.key
+      dynamic "copy_action" {
+        for_each = lookup(rule.value, "destination_vault_arns", [])
+        content {
+          destination_vault_arn = copy_action.key
 
-        dynamic "lifecycle" {
-          for_each = var.copy_action_cold_storage_after != null || var.copy_action_delete_after != null ? ["true"] : []
-          content {
-            cold_storage_after = var.copy_action_cold_storage_after
-            delete_after       = var.copy_action_delete_after
+          dynamic "lifecycle" {
+            for_each = lookup(rule.value, "copy_action_cold_storage_after", null) != null || lookup(rule.value, "copy_action_delete_after", null) != null ? ["true"] : []
+            content {
+              cold_storage_after = lookup(rule.value, "copy_action_cold_storage_after", null)
+              delete_after       = lookup(rule.value, "copy_action_delete_after", null)
+            }
           }
         }
       }
