@@ -8,7 +8,7 @@ locals {
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default.*.arn : data.aws_backup_vault.existing.*.arn)
-  compat_rule = [{
+  compat_rule = {
     rule_name                = module.this.id
     schedule                 = var.schedule
     start_window             = var.start_window
@@ -25,7 +25,7 @@ locals {
         delete_after       = var.copy_action_delete_after
       }
     }
-  }]
+  }
 }
 
 data "aws_partition" "current" {}
@@ -56,7 +56,7 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   dynamic "rule" {
-    for_each = length(var.rules) > 0 ? var.rules : tolist(local.compat_rule)
+    for_each = length(var.rules) > 0 ? var.rules : tolist(tomap(local.compat_rule))
     content {
       rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
       target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
