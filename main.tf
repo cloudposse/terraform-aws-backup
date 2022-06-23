@@ -56,7 +56,7 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   dynamic "rule" {
-    for_each = length(var.rules) > 0 ? var.rules : tolist([local.compat_rule])
+    for_each = length(var.rules) > 0 ? var.rules : tolist(local.compat_rule)
     content {
       rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
       target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default.*.name : data.aws_backup_vault.existing.*.name)
