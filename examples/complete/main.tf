@@ -54,8 +54,8 @@ module "backup" {
         delete_after       = var.delete_after
       }
       destination_vault_arns = var.destination_vault_arns
-      iam_role_enabled = var.iam_role_enabled
-      plan_enabled = var.plan_enabled
+      iam_role_enabled       = var.iam_role_enabled
+      plan_enabled           = var.plan_enabled
     }
   ]
 

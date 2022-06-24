@@ -40,9 +40,9 @@ variable "delete_after" {
 }
 
 variable "destination_vault_arns" {
-  type = list
-  description = "Specifies the destination vault arns used for copy actions" 
-  default = []
+  type        = list
+  description = "Specifies the destination vault arns used for copy actions"
+  default     = []
 }
 
 variable "plan_enabled" {
