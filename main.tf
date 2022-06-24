@@ -11,7 +11,7 @@ locals {
 
   # This is for backwards compatibility
   single_rule = [{
-    rule_name                = module.this.id
+    name                     = module.this.id
     schedule                 = var.schedule
     start_window             = var.start_window
     completion_window        = var.completion_window

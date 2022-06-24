@@ -109,67 +109,84 @@ provider "aws" {
 }
 
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.8.0"
+  source = "cloudposse/vpc/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
   attributes = var.attributes
   tags       = var.tags
   delimiter  = var.delimiter
-  cidr_block = "172.16.0.0/16"
+
+  ipv4_primary_cidr_block = "172.16.0.0/16"
 }
 
 module "subnets" {
-  source               = "git::https://github.com/cloudposse/terraform-aws-dynamic-subnets.git?ref=tags/0.16.0"
+  source = "cloudposse/dynamic-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   availability_zones   = var.availability_zones
-  namespace            = var.namespace
-  stage                = var.stage
-  name                 = var.name
-  attributes           = var.attributes
-  tags                 = var.tags
-  delimiter            = var.delimiter
   vpc_id               = module.vpc.vpc_id
-  igw_id               = module.vpc.igw_id
-  cidr_block           = module.vpc.vpc_cidr_block
+  igw_id               = [module.vpc.igw_id]
+  ipv4_cidr_block      = module.vpc.vpc_cidr_block
   nat_gateway_enabled  = false
   nat_instance_enabled = false
 }
 
 module "efs" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-efs.git?ref=tags/0.10.0"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
+  source = "cloudposse/efs/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   region             = var.region
   availability_zones = var.availability_zones
   vpc_id             = module.vpc.vpc_id
   subnets            = module.subnets.private_subnet_ids
-  security_groups    = [module.vpc.vpc_default_security_group_id]
+
+  allowed_security_group_ids = [module.vpc.vpc_default_security_group_id]
 }
 
 module "backup" {
   source = "cloudposse/backup/aws"
   # Cloud Posse recommends pinning every module to a specific version
   # version     = "x.x.x"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
-  backup_resources   = [module.efs.arn]
-  not_resources      = var.not_resources
-  rules = [{
-    name               = var.name
-    schedule           = var.schedule
-    start_window       = var.start_window
-    completion_window  = var.completion_window
-    cold_storage_after = var.cold_storage_after
-    delete_after       = var.delete_after
-  }]
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
+  backup_resources = [module.efs.arn]
+  not_resources    = var.not_resources
+  rules = [
+    {
+      name               = var.name
+      schedule           = var.schedule
+      start_window       = var.start_window
+      completion_window  = var.completion_window
+      cold_storage_after = var.cold_storage_after
+      delete_after       = var.delete_after
+    },
+  ]
 }
 ```
 
@@ -429,8 +446,8 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 ### Contributors
 
 <!-- markdownlint-disable -->
-|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] |
-|---|---|---|
+|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![RB][nitrocode_avatar]][nitrocode_homepage]<br/>[RB][nitrocode_homepage] |
+|---|---|---|---|
 <!-- markdownlint-restore -->
 
 
@@ -442,6 +459,9 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
   [goruha_homepage]: https://github.com/goruha/
   [goruha_avatar]: https://img.cloudposse.com/150x150/https://github.com/goruha.png
+
+  [nitrocode_homepage]: https://github.com/nitrocode/
+  [nitrocode_avatar]: https://img.cloudposse.com/150x150/https://github.com/nitrocode.png
 
 [![README Footer][readme_footer_img]][readme_footer_link]
 [![Beacon][beacon]][website]
