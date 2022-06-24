@@ -75,7 +75,7 @@ variable "permissions_boundary" {
 }
 
 variable "advanced_backup_setting" {
-  type        = map(any)
+  type        = any
   default     = null
   description = "An object that specifies backup options for each resource type."
 }
