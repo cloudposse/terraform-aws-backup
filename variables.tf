@@ -5,7 +5,7 @@ variable "kms_key_arn" {
 }
 
 variable "rules" {
-  type        = list(map(any))
+  type        = any
   description = "An array of rule maps used to define schedules in a backup plan"
   default     = []
 }
