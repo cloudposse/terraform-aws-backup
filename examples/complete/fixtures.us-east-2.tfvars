@@ -19,3 +19,10 @@ completion_window = 120
 cold_storage_after = 30
 
 delete_after = 180
+
+advanced_backup_setting = {
+  backup_options = {
+    WindowsVSS = "enabled"
+  }
+  resource_type = "EC2"
+}

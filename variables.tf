@@ -73,3 +73,9 @@ variable "permissions_boundary" {
   default     = null
   description = "The permissions boundary to set on the role"
 }
+
+variable "advanced_backup_setting" {
+  type        = map(any)
+  default     = null
+  description = "An object that specifies backup options for each resource type."
+}

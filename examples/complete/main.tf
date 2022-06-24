@@ -56,6 +56,8 @@ module "backup" {
     }
   ]
 
+  advanced_backup_setting = var.advanced_backup_setting
+
   context = module.this.context
 }
 
@@ -73,6 +75,8 @@ module "backup_deprecated" {
   completion_window  = var.completion_window
   cold_storage_after = var.cold_storage_after
   delete_after       = var.delete_after
+
+  advanced_backup_setting = var.advanced_backup_setting
 
   context = module.this.context
 }

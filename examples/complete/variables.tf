@@ -38,3 +38,9 @@ variable "delete_after" {
   type        = number
   description = "Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after`"
 }
+
+variable "advanced_backup_setting" {
+  type        = map(any)
+  default     = null
+  description = "An object that specifies backup options for each resource type."
+}

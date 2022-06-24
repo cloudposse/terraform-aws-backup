@@ -98,6 +98,15 @@ resource "aws_backup_plan" "default" {
     }
   }
 
+  dynamic "advanced_backup_setting" {
+    for_each = var.advanced_backup_setting != null ? [true] : []
+
+    content {
+      resource_type  = lookup(var.advanced_backup_setting, "resource_type")
+      backup_options = lookup(var.advanced_backup_setting, "backup_options")
+    }
+  }
+
   tags = module.this.tags
 }
 
