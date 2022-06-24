@@ -82,7 +82,7 @@ resource "aws_backup_plan" "default" {
       dynamic "copy_action" {
         for_each = toset(lookup(rule.value.copy_action, "destination_vault_arn", []))
         content {
-          destination_vault_arn = lookup(rule.value.copy_action, "destination_vault_arn", null)
+          destination_vault_arn = copy_action.value
 
           dynamic "lifecycle" {
             for_each = lookup(rule.value.copy_action, "lifecycle", null) != null != null ? [true] : []
