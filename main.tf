@@ -28,7 +28,7 @@ locals {
       }
     }
   }]
-  compatible_rules = length(var.rules) == 0 ? local.single_rule : tolist([{ for k, v in local.single_rule[0] : k => v }])
+  compatible_rules = length(var.rules) == 0 ? local.single_rule : [{ for k, v in local.single_rule[0] : k => v }]
 }
 
 data "aws_partition" "current" {}
