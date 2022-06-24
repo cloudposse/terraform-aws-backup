@@ -8,8 +8,10 @@ locals {
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default.*.arn : data.aws_backup_vault.existing.*.arn)
-  compat_rule = {
-    rule_name                = module.this.id
+
+  # This is for backwards compatibility
+  single_rule = [{
+    name                     = module.this.id
     schedule                 = var.schedule
     start_window             = var.start_window
     completion_window        = var.completion_window
@@ -25,7 +27,8 @@ locals {
         delete_after       = var.copy_action_delete_after
       }
     }
-  }
+  }]
+  compatible_rules = length(var.rules) == 0 ? local.single_rule : [{ for k, v in local.single_rule[0] : k => v }]
 }
 
 data "aws_partition" "current" {}
@@ -56,7 +59,7 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   dynamic "rule" {
-    for_each = length(var.rules) > 0 ? var.rules : tolist(local.compat_rule)
+    for_each = length(var.rules) > 0 ? var.rules : local.compatible_rules
 
     content {
       rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
@@ -68,23 +71,25 @@ resource "aws_backup_plan" "default" {
       enable_continuous_backup = lookup(rule.value, "enable_continuous_backup", null)
 
       dynamic "lifecycle" {
-        for_each = lookup(rule.value, "cold_storage_after", null) != null || lookup(rule.value, "delete_after", null) != null ? ["true"] : []
+        for_each = lookup(rule.value, "lifecycle", null) != null ? [true] : []
+
         content {
-          cold_storage_after = lookup(rule.value, "cold_storage_after", null)
-          delete_after       = lookup(rule.value, "delete_after", null)
+          cold_storage_after = lookup(rule.value.lifecycle, "cold_storage_after", null)
+          delete_after       = lookup(rule.value.lifecycle, "delete_after", null)
         }
       }
 
       dynamic "copy_action" {
         for_each = toset(lookup(rule.value, "destination_vault_arns", []))
         content {
-          destination_vault_arn = copy_action.key
+          destination_vault_arn = copy_action.value
 
           dynamic "lifecycle" {
-            for_each = lookup(rule.value, "copy_action_cold_storage_after", null) != null || lookup(rule.value, "copy_action_delete_after", null) != null ? ["true"] : []
+            for_each = lookup(rule.value.copy_action, "lifecycle", null) != null != null ? [true] : []
+
             content {
-              cold_storage_after = lookup(rule.value, "copy_action_cold_storage_after", null)
-              delete_after       = lookup(rule.value, "copy_action_delete_after", null)
+              cold_storage_after = lookup(rule.value.copy_action.lifecycle, "cold_storage_after", null)
+              delete_after       = lookup(rule.value.copy_action.lifecycle, "delete_after", null)
             }
           }
         }
@@ -119,7 +124,7 @@ resource "aws_iam_role" "default" {
 
 
 data "aws_iam_role" "existing" {
-  count = local.enabled && var.iam_role_enabled == false ? (var.plan_enabled == true ? 1 : 0) : 0
+  count = local.enabled && ! var.iam_role_enabled && var.plan_enabled ? 1 : 0
   name  = local.iam_role_name
 }
 

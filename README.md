@@ -109,67 +109,84 @@ provider "aws" {
 }
 
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.8.0"
+  source = "cloudposse/vpc/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
   attributes = var.attributes
   tags       = var.tags
   delimiter  = var.delimiter
-  cidr_block = "172.16.0.0/16"
+
+  ipv4_primary_cidr_block = "172.16.0.0/16"
 }
 
 module "subnets" {
-  source               = "git::https://github.com/cloudposse/terraform-aws-dynamic-subnets.git?ref=tags/0.16.0"
+  source = "cloudposse/dynamic-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   availability_zones   = var.availability_zones
-  namespace            = var.namespace
-  stage                = var.stage
-  name                 = var.name
-  attributes           = var.attributes
-  tags                 = var.tags
-  delimiter            = var.delimiter
   vpc_id               = module.vpc.vpc_id
-  igw_id               = module.vpc.igw_id
-  cidr_block           = module.vpc.vpc_cidr_block
+  igw_id               = [module.vpc.igw_id]
+  ipv4_cidr_block      = module.vpc.vpc_cidr_block
   nat_gateway_enabled  = false
   nat_instance_enabled = false
 }
 
 module "efs" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-efs.git?ref=tags/0.10.0"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
+  source = "cloudposse/efs/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   region             = var.region
   availability_zones = var.availability_zones
   vpc_id             = module.vpc.vpc_id
   subnets            = module.subnets.private_subnet_ids
-  security_groups    = [module.vpc.vpc_default_security_group_id]
+
+  allowed_security_group_ids = [module.vpc.vpc_default_security_group_id]
 }
 
 module "backup" {
   source = "cloudposse/backup/aws"
   # Cloud Posse recommends pinning every module to a specific version
   # version     = "x.x.x"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
-  backup_resources   = [module.efs.arn]
-  not_resources      = var.not_resources
-  rules = [{
-    name               = var.name
-    schedule           = var.schedule
-    start_window       = var.start_window
-    completion_window  = var.completion_window
-    cold_storage_after = var.cold_storage_after
-    delete_after       = var.delete_after
-  }]
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
+  backup_resources = [module.efs.arn]
+  not_resources    = var.not_resources
+  rules = [
+    {
+      name               = var.name
+      schedule           = var.schedule
+      start_window       = var.start_window
+      completion_window  = var.completion_window
+      cold_storage_after = var.cold_storage_after
+      delete_after       = var.delete_after
+    },
+  ]
 }
 ```
 
@@ -259,7 +276,7 @@ Available targets:
 | <a name="input_plan_enabled"></a> [plan\_enabled](#input\_plan\_enabled) | Should we create a new Plan | `bool` | `true` | no |
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br>Characters matching the regex will be removed from the ID elements.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
-| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `list(map(any))` | `[]` | no |
+| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `list(any)` | `[]` | no |
 | <a name="input_schedule"></a> [schedule](#input\_schedule) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br>    type  = string<br>    key   = string<br>    value = string<br>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
@@ -429,8 +446,8 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 ### Contributors
 
 <!-- markdownlint-disable -->
-|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] |
-|---|---|---|
+|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![RB][nitrocode_avatar]][nitrocode_homepage]<br/>[RB][nitrocode_homepage] |
+|---|---|---|---|
 <!-- markdownlint-restore -->
 
 
@@ -442,6 +459,9 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
   [goruha_homepage]: https://github.com/goruha/
   [goruha_avatar]: https://img.cloudposse.com/150x150/https://github.com/goruha.png
+
+  [nitrocode_homepage]: https://github.com/nitrocode/
+  [nitrocode_avatar]: https://img.cloudposse.com/150x150/https://github.com/nitrocode.png
 
 [![README Footer][readme_footer_img]][readme_footer_link]
 [![Beacon][beacon]][website]

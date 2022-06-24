@@ -38,3 +38,21 @@ variable "delete_after" {
   type        = number
   description = "Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after`"
 }
+
+variable "destination_vault_arns" {
+  type = list
+  description = "Specifies the destination vault arns used for copy actions" 
+  default = []
+}
+
+variable "plan_enabled" {
+  type        = bool
+  description = "Should we create a new Plan"
+  default     = true
+}
+
+variable "iam_role_enabled" {
+  type        = bool
+  description = "Should we create a new Iam Role and Policy Attachment"
+  default     = true
+}
