@@ -5,6 +5,7 @@
 
 # Name of this project
 name: terraform-aws-backup
+
 # Tags of this project
 tags:
   - aws
@@ -27,9 +28,11 @@ tags:
   - ebs
   - ebs-backup
   - ebs-volumes
+
 # Categories of this project
 categories:
   - terraform-modules/networking
+
 # Logo for this project
 #logo: docs/logo.png
 
@@ -55,6 +58,7 @@ related:
   - name: "terraform-aws-efs-cloudwatch-sns-alarms"
     description: "Terraform module that configures CloudWatch SNS alerts for EFS"
     url: "https://github.com/cloudposse/terraform-aws-efs-cloudwatch-sns-alarms"
+
 # Short description of this project
 description: |-
   Terraform module to provision [AWS Backup](https://aws.amazon.com/backup), a fully managed backup service that makes it easy to centralize and automate
@@ -62,6 +66,7 @@ description: |-
   Amazon EFS file systems, and AWS Storage Gateway volumes.
 
   **NOTE**: the syntax of declaring a backup schedule has changed as of release 0.14.0, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
+
 # How to use this project
 usage: |2-
 
@@ -76,72 +81,91 @@ usage: |2-
   }
 
   module "vpc" {
-    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.8.0"
+    source = "cloudposse/vpc/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
+
     namespace  = var.namespace
     stage      = var.stage
     name       = var.name
     attributes = var.attributes
     tags       = var.tags
     delimiter  = var.delimiter
-    cidr_block = "172.16.0.0/16"
+
+    ipv4_primary_cidr_block = "172.16.0.0/16"
   }
 
   module "subnets" {
-    source               = "git::https://github.com/cloudposse/terraform-aws-dynamic-subnets.git?ref=tags/0.16.0"
+    source = "cloudposse/dynamic-subnets/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
+
+    namespace  = var.namespace
+    stage      = var.stage
+    name       = var.name
+    attributes = var.attributes
+    tags       = var.tags
+    delimiter  = var.delimiter
+
     availability_zones   = var.availability_zones
-    namespace            = var.namespace
-    stage                = var.stage
-    name                 = var.name
-    attributes           = var.attributes
-    tags                 = var.tags
-    delimiter            = var.delimiter
     vpc_id               = module.vpc.vpc_id
-    igw_id               = module.vpc.igw_id
-    cidr_block           = module.vpc.vpc_cidr_block
+    igw_id               = [module.vpc.igw_id]
+    ipv4_cidr_block      = module.vpc.vpc_cidr_block
     nat_gateway_enabled  = false
     nat_instance_enabled = false
   }
 
   module "efs" {
-    source             = "git::https://github.com/cloudposse/terraform-aws-efs.git?ref=tags/0.10.0"
-    namespace          = var.namespace
-    stage              = var.stage
-    name               = var.name
-    attributes         = var.attributes
-    tags               = var.tags
-    delimiter          = var.delimiter
+    source = "cloudposse/efs/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
+
+    namespace  = var.namespace
+    stage      = var.stage
+    name       = var.name
+    attributes = var.attributes
+    tags       = var.tags
+    delimiter  = var.delimiter
+
     region             = var.region
     availability_zones = var.availability_zones
     vpc_id             = module.vpc.vpc_id
     subnets            = module.subnets.private_subnet_ids
-    security_groups    = [module.vpc.vpc_default_security_group_id]
+
+    allowed_security_group_ids = [module.vpc.vpc_default_security_group_id]
   }
 
   module "backup" {
     source = "cloudposse/backup/aws"
     # Cloud Posse recommends pinning every module to a specific version
     # version     = "x.x.x"
-    namespace          = var.namespace
-    stage              = var.stage
-    name               = var.name
-    attributes         = var.attributes
-    tags               = var.tags
-    delimiter          = var.delimiter
-    backup_resources   = [module.efs.arn]
-    not_resources      = var.not_resources
-    rules = [{
-      name               = var.name
-      schedule           = var.schedule
-      start_window       = var.start_window
-      completion_window  = var.completion_window
-      cold_storage_after = var.cold_storage_after
-      delete_after       = var.delete_after
-    }]
+
+    namespace  = var.namespace
+    stage      = var.stage
+    name       = var.name
+    attributes = var.attributes
+    tags       = var.tags
+    delimiter  = var.delimiter
+
+    backup_resources = [module.efs.arn]
+    not_resources    = var.not_resources
+    rules = [
+      {
+        name               = var.name
+        schedule           = var.schedule
+        start_window       = var.start_window
+        completion_window  = var.completion_window
+        cold_storage_after = var.cold_storage_after
+        delete_after       = var.delete_after
+      },
+    ]
   }
   ```
+
 include:
   - "docs/targets.md"
   - "docs/terraform.md"
+
 # Contributors to this project
 contributors:
   - name: "Erik Osterman"
@@ -153,3 +177,6 @@ contributors:
   - name: "Igor Rodionov"
     homepage: "https://github.com/goruha/"
     github: "goruha"
+  - name: "RB"
+    homepage: "https://github.com/nitrocode/"
+    github: "nitrocode"
