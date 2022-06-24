@@ -117,6 +117,7 @@ resource "aws_iam_role" "default" {
   permissions_boundary = var.permissions_boundary
 }
 
+
 data "aws_iam_role" "existing" {
   count = local.enabled && var.iam_role_enabled == false ? (var.plan_enabled == true ? 1 : 0) : 0
   name  = local.iam_role_name
