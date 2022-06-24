@@ -67,7 +67,7 @@
 | <a name="input_plan_enabled"></a> [plan\_enabled](#input\_plan\_enabled) | Should we create a new Plan | `bool` | `true` | no |
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br>Characters matching the regex will be removed from the ID elements.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
-| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `list(map(any))` | `[]` | no |
+| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `any` | `[]` | no |
 | <a name="input_schedule"></a> [schedule](#input\_schedule) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br>    type  = string<br>    key   = string<br>    value = string<br>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
