@@ -32,6 +32,8 @@ Terraform module to provision [AWS Backup](https://aws.amazon.com/backup), a ful
 the back up of data across AWS services such as Amazon EBS volumes, Amazon EC2 instances, Amazon RDS databases, Amazon DynamoDB tables,
 Amazon EFS file systems, and AWS Storage Gateway volumes.
 
+**NOTE**: the syntax of declaring a backup schedule has changed as of release 0.14.0, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
+
 ---
 
 This project is part of our comprehensive ["SweetOps"](https://cpco.io/sweetops) approach towards DevOps.
@@ -107,64 +109,84 @@ provider "aws" {
 }
 
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.8.0"
+  source = "cloudposse/vpc/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
   attributes = var.attributes
   tags       = var.tags
   delimiter  = var.delimiter
-  cidr_block = "172.16.0.0/16"
+
+  ipv4_primary_cidr_block = "172.16.0.0/16"
 }
 
 module "subnets" {
-  source               = "git::https://github.com/cloudposse/terraform-aws-dynamic-subnets.git?ref=tags/0.16.0"
+  source = "cloudposse/dynamic-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   availability_zones   = var.availability_zones
-  namespace            = var.namespace
-  stage                = var.stage
-  name                 = var.name
-  attributes           = var.attributes
-  tags                 = var.tags
-  delimiter            = var.delimiter
   vpc_id               = module.vpc.vpc_id
-  igw_id               = module.vpc.igw_id
-  cidr_block           = module.vpc.vpc_cidr_block
+  igw_id               = [module.vpc.igw_id]
+  ipv4_cidr_block      = module.vpc.vpc_cidr_block
   nat_gateway_enabled  = false
   nat_instance_enabled = false
 }
 
 module "efs" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-efs.git?ref=tags/0.10.0"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
+  source = "cloudposse/efs/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
   region             = var.region
   availability_zones = var.availability_zones
   vpc_id             = module.vpc.vpc_id
   subnets            = module.subnets.private_subnet_ids
-  security_groups    = [module.vpc.vpc_default_security_group_id]
+
+  allowed_security_group_ids = [module.vpc.vpc_default_security_group_id]
 }
 
 module "backup" {
   source = "cloudposse/backup/aws"
   # Cloud Posse recommends pinning every module to a specific version
   # version     = "x.x.x"
-  namespace          = var.namespace
-  stage              = var.stage
-  name               = var.name
-  attributes         = var.attributes
-  tags               = var.tags
-  delimiter          = var.delimiter
-  backup_resources   = [module.efs.arn]
-  not_resources      = var.not_resources
-  schedule           = var.schedule
-  start_window       = var.start_window
-  completion_window  = var.completion_window
-  cold_storage_after = var.cold_storage_after
-  delete_after       = var.delete_after
+
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  attributes = var.attributes
+  tags       = var.tags
+  delimiter  = var.delimiter
+
+  backup_resources = [module.efs.arn]
+  not_resources    = var.not_resources
+  rules = [
+    {
+      name               = var.name
+      schedule           = var.schedule
+      start_window       = var.start_window
+      completion_window  = var.completion_window
+      cold_storage_after = var.cold_storage_after
+      delete_after       = var.delete_after
+    },
+  ]
 }
 ```
 
@@ -192,8 +214,6 @@ Available targets:
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.0 |
-| <a name="requirement_local"></a> [local](#requirement\_local) | >= 1.2 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 
 ## Providers
 
@@ -229,16 +249,16 @@ Available targets:
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br>This is for some rare cases where resources want additional configuration of tags<br>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br>in the order they appear in the list. New attributes are appended to the<br>end of the list. The elements of the list are joined by the `delimiter`<br>and treated as a single ID element. | `list(string)` | `[]` | no |
 | <a name="input_backup_resources"></a> [backup\_resources](#input\_backup\_resources) | An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan | `list(string)` | `[]` | no |
-| <a name="input_cold_storage_after"></a> [cold\_storage\_after](#input\_cold\_storage\_after) | Specifies the number of days after creation that a recovery point is moved to cold storage | `number` | `null` | no |
-| <a name="input_completion_window"></a> [completion\_window](#input\_completion\_window) | The amount of time AWS Backup attempts a backup before canceling the job and returning an error. Must be at least 60 minutes greater than `start_window` | `number` | `null` | no |
+| <a name="input_cold_storage_after"></a> [cold\_storage\_after](#input\_cold\_storage\_after) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>Specifies the number of days after creation that a recovery point is moved to cold storage | `number` | `null` | no |
+| <a name="input_completion_window"></a> [completion\_window](#input\_completion\_window) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>The amount of time AWS Backup attempts a backup before canceling the job and returning an error. Must be at least 60 minutes greater than `start_window` | `number` | `null` | no |
 | <a name="input_context"></a> [context](#input\_context) | Single object for setting entire context at once.<br>See description of individual variables for details.<br>Leave string and numeric variables as `null` to use default value.<br>Individual variable settings (non-null) override settings in context object,<br>except for attributes, tags, and additional\_tag\_map, which are merged. | `any` | <pre>{<br>  "additional_tag_map": {},<br>  "attributes": [],<br>  "delimiter": null,<br>  "descriptor_formats": {},<br>  "enabled": true,<br>  "environment": null,<br>  "id_length_limit": null,<br>  "label_key_case": null,<br>  "label_order": [],<br>  "label_value_case": null,<br>  "labels_as_tags": [<br>    "unset"<br>  ],<br>  "name": null,<br>  "namespace": null,<br>  "regex_replace_chars": null,<br>  "stage": null,<br>  "tags": {},<br>  "tenant": null<br>}</pre> | no |
-| <a name="input_copy_action_cold_storage_after"></a> [copy\_action\_cold\_storage\_after](#input\_copy\_action\_cold\_storage\_after) | For copy operation, specifies the number of days after creation that a recovery point is moved to cold storage | `number` | `null` | no |
-| <a name="input_copy_action_delete_after"></a> [copy\_action\_delete\_after](#input\_copy\_action\_delete\_after) | For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after` | `number` | `null` | no |
-| <a name="input_delete_after"></a> [delete\_after](#input\_delete\_after) | Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after` | `number` | `null` | no |
+| <a name="input_copy_action_cold_storage_after"></a> [copy\_action\_cold\_storage\_after](#input\_copy\_action\_cold\_storage\_after) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>For copy operation, specifies the number of days after creation that a recovery point is moved to cold storage | `number` | `null` | no |
+| <a name="input_copy_action_delete_after"></a> [copy\_action\_delete\_after](#input\_copy\_action\_delete\_after) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>For copy operation, specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `copy_action_cold_storage_after` | `number` | `null` | no |
+| <a name="input_delete_after"></a> [delete\_after](#input\_delete\_after) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>Specifies the number of days after creation that a recovery point is deleted. Must be 90 days greater than `cold_storage_after` | `number` | `null` | no |
 | <a name="input_delimiter"></a> [delimiter](#input\_delimiter) | Delimiter to be used between ID elements.<br>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
 | <a name="input_descriptor_formats"></a> [descriptor\_formats](#input\_descriptor\_formats) | Describe additional descriptors to be output in the `descriptors` output map.<br>Map of maps. Keys are names of descriptors. Values are maps of the form<br>`{<br>   format = string<br>   labels = list(string)<br>}`<br>(Type is `any` so the map values can later be enhanced to provide additional options.)<br>`format` is a Terraform format string to be passed to the `format()` function.<br>`labels` is a list of labels, in order, to pass to `format()` function.<br>Label values will be normalized before being passed to `format()` so they will be<br>identical to how they appear in `id`.<br>Default is `{}` (`descriptors` output will be empty). | `any` | `{}` | no |
-| <a name="input_destination_vault_arn"></a> [destination\_vault\_arn](#input\_destination\_vault\_arn) | An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup | `string` | `null` | no |
-| <a name="input_enable_continuous_backup"></a> [enable\_continuous\_backup](#input\_enable\_continuous\_backup) | Enable continuous backups for supported resources. | `bool` | `null` | no |
+| <a name="input_destination_vault_arn"></a> [destination\_vault\_arn](#input\_destination\_vault\_arn) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup | `string` | `null` | no |
+| <a name="input_enable_continuous_backup"></a> [enable\_continuous\_backup](#input\_enable\_continuous\_backup) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>Enable continuous backups for supported resources. | `bool` | `null` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | ID element. Usually used for region e.g. 'uw2', 'us-west-2', OR role 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
 | <a name="input_iam_role_enabled"></a> [iam\_role\_enabled](#input\_iam\_role\_enabled) | Should we create a new Iam Role and Policy Attachment | `bool` | `true` | no |
@@ -252,13 +272,15 @@ Available targets:
 | <a name="input_name"></a> [name](#input\_name) | ID element. Usually the component or solution name, e.g. 'app' or 'jenkins'.<br>This is the only ID element not also included as a `tag`.<br>The "name" tag is set to the full `id` string. There is no tag with the value of the `name` input. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | ID element. Usually an abbreviation of your organization name, e.g. 'eg' or 'cp', to help ensure generated IDs are globally unique | `string` | `null` | no |
 | <a name="input_not_resources"></a> [not\_resources](#input\_not\_resources) | An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to exclude from a backup plan | `list(string)` | `[]` | no |
+| <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | The permissions boundary to set on the role | `string` | `null` | no |
 | <a name="input_plan_enabled"></a> [plan\_enabled](#input\_plan\_enabled) | Should we create a new Plan | `bool` | `true` | no |
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br>Characters matching the regex will be removed from the ID elements.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
-| <a name="input_schedule"></a> [schedule](#input\_schedule) | A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
+| <a name="input_rules"></a> [rules](#input\_rules) | An array of rule maps used to define schedules in a backup plan | `list(any)` | `[]` | no |
+| <a name="input_schedule"></a> [schedule](#input\_schedule) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>A CRON expression specifying when AWS Backup initiates a backup job | `string` | `null` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br>    type  = string<br>    key   = string<br>    value = string<br>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
-| <a name="input_start_window"></a> [start\_window](#input\_start\_window) | The amount of time in minutes before beginning a backup. Minimum value is 60 minutes | `number` | `null` | no |
+| <a name="input_start_window"></a> [start\_window](#input\_start\_window) | DEPRECATED: see [migration guide](./docs/migration-0.13.x-0.14.x+.md)<br>The amount of time in minutes before beginning a backup. Minimum value is 60 minutes | `number` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `{'BusinessUnit': 'XYZ'}`).<br>Neither the tag keys nor the tag values will be modified by this module. | `map(string)` | `{}` | no |
 | <a name="input_tenant"></a> [tenant](#input\_tenant) | ID element \_(Rarely used, not included by default)\_. A customer identifier, indicating who this instance of a resource is for | `string` | `null` | no |
 | <a name="input_vault_enabled"></a> [vault\_enabled](#input\_vault\_enabled) | Should we create a new Vault | `bool` | `true` | no |
@@ -273,6 +295,8 @@ Available targets:
 | <a name="output_backup_selection_id"></a> [backup\_selection\_id](#output\_backup\_selection\_id) | Backup Selection ID |
 | <a name="output_backup_vault_arn"></a> [backup\_vault\_arn](#output\_backup\_vault\_arn) | Backup Vault ARN |
 | <a name="output_backup_vault_id"></a> [backup\_vault\_id](#output\_backup\_vault\_id) | Backup Vault ID |
+| <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | The Amazon Resource Name (ARN) specifying the role |
+| <a name="output_role_name"></a> [role\_name](#output\_role\_name) | The name of the IAM role created |
 <!-- markdownlint-restore -->
 
 
@@ -422,8 +446,8 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 ### Contributors
 
 <!-- markdownlint-disable -->
-|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] |
-|---|---|---|
+|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![RB][nitrocode_avatar]][nitrocode_homepage]<br/>[RB][nitrocode_homepage] |
+|---|---|---|---|
 <!-- markdownlint-restore -->
 
 
@@ -435,6 +459,9 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
   [goruha_homepage]: https://github.com/goruha/
   [goruha_avatar]: https://img.cloudposse.com/150x150/https://github.com/goruha.png
+
+  [nitrocode_homepage]: https://github.com/nitrocode/
+  [nitrocode_avatar]: https://img.cloudposse.com/150x150/https://github.com/nitrocode.png
 
 [![README Footer][readme_footer_img]][readme_footer_link]
 [![Beacon][beacon]][website]

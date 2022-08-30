@@ -40,8 +40,34 @@ module "efs" {
 module "backup" {
   source = "../.."
 
-  backup_resources   = [module.efs.arn]
-  not_resources      = var.not_resources
+  backup_resources = [module.efs.arn]
+  not_resources    = var.not_resources
+
+  rules = [
+    {
+      name              = "${module.this.name}-daily"
+      schedule          = var.schedule
+      start_window      = var.start_window
+      completion_window = var.completion_window
+      lifecycle = {
+        cold_storage_after = var.cold_storage_after
+        delete_after       = var.delete_after
+      }
+    }
+  ]
+
+  context = module.this.context
+}
+
+module "backup_deprecated" {
+  source = "../.."
+
+  attributes = ["deprecated"]
+
+  backup_resources = [module.efs.arn]
+  not_resources    = var.not_resources
+
+  name               = "${module.this.name}-daily"
   schedule           = var.schedule
   start_window       = var.start_window
   completion_window  = var.completion_window
