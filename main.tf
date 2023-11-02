@@ -8,27 +8,6 @@ locals {
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default.*.id : data.aws_backup_vault.existing.*.id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default.*.arn : data.aws_backup_vault.existing.*.arn)
-
-  # This is for backwards compatibility
-  single_rule = [{
-    name                     = module.this.id
-    schedule                 = var.schedule
-    start_window             = var.start_window
-    completion_window        = var.completion_window
-    enable_continuous_backup = var.enable_continuous_backup
-    lifecycle = {
-      cold_storage_after = var.cold_storage_after
-      delete_after       = var.delete_after
-    }
-    copy_action = {
-      destination_vault_arn = var.destination_vault_arn
-      lifecycle = {
-        cold_storage_after = var.copy_action_cold_storage_after
-        delete_after       = var.copy_action_delete_after
-      }
-    }
-  }]
-  compatible_rules = length(var.rules) == 0 ? local.single_rule : [{ for k, v in local.single_rule[0] : k => v }]
 }
 
 data "aws_partition" "current" {}
@@ -59,7 +38,7 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   dynamic "rule" {
-    for_each = length(var.rules) > 0 ? var.rules : local.compatible_rules
+    for_each = var.rules
 
     content {
       rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
