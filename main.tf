@@ -50,7 +50,7 @@ resource "aws_backup_vault" "default" {
 }
 
 resource "aws_backup_vault_lock_configuration" "default" {
-  count       = local.vault_enabled && var.backup_vault_lock_configuration != null ? 1 : 0
+  count               = local.vault_enabled && var.backup_vault_lock_configuration != null ? 1 : 0
   backup_vault_name   = aws_backup_vault.default[0].id
   changeable_for_days = var.backup_vault_lock_configuration.changeable_for_days
   max_retention_days  = var.backup_vault_lock_configuration.max_retention_days
