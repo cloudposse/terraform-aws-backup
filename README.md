@@ -187,6 +187,10 @@ module "backup" {
       delete_after       = var.delete_after
     },
   ]
+  backup_vault_lock_configuration = {
+    max_retention_days = 365
+    min_retention_days = 30
+  }
 }
 ```
 

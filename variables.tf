@@ -73,3 +73,16 @@ variable "permissions_boundary" {
   default     = null
   description = "The permissions boundary to set on the role"
 }
+
+variable "backup_vault_lock_configuration" {
+  type = object({
+    changeable_for_days = optional(number)
+    max_retention_days  = optional(number)
+    min_retention_days  = optional(number)
+  })
+  description = <<-EOT
+    The backup vault lock configuration, each vault can have one vault lock in place. This will enable Backup Vault Lock on an AWS Backup vault  it prevents the deletion of backup data for the specified retention period. During this time, the backup data remains immutable and cannot be deleted or modified."
+    `changeable_for_days` - The number of days before the lock date. If omitted creates a vault lock in `governance` mode, otherwise it will create a vault lock in `compliance` mode.
+  EOT
+  default     = null
+}
