@@ -141,19 +141,51 @@ module "backup" {
   tags       = var.tags
   delimiter  = var.delimiter
 
+  plan_name_suffix = var.plan_name_suffix
+  vault_enabled    = var.vault_enabled
+  iam_role_enabled = var.iam_role_enabled
+  plan_enabled     = var.plan_enabled
+
+  selection_tags   = var.selection_tags
   backup_resources = [module.efs.arn]
   not_resources    = var.not_resources
-  rules = [
-    {
-      name               = var.name
-      schedule           = var.schedule
-      start_window       = var.start_window
-      completion_window  = var.completion_window
+
+  rules = var.rules
+
+  kms_key_arn = var.kms_key_arn
+
+  advanced_backup_setting         = var.advanced_backup_setting
+  backup_vault_lock_configuration = var.backup_vault_lock_configuration
+
+}
+```
+
+In the above example `var.rules` could be defined as follows:
+
+```hcl
+rules = [
+  {
+    name              = "${module.this.name}-daily"
+    schedule          = var.schedule
+    start_window      = var.start_window
+    completion_window = var.completion_window
+    lifecycle         = {
       cold_storage_after = var.cold_storage_after
       delete_after       = var.delete_after
-    },
-  ]
-}
+    }
+  }
+]
+```
+
+or as yaml
+
+```yaml
+rules:
+  - name: "plan-daily"
+    schedule: "cron(0 5 ? * * *)"
+    start_window: 320 # 60 * 8             # minutes
+    completion_window: 10080 # 60 * 24 * 7 # minutes
+    delete_after: 35 # 7 * 5     
 ```
 
 
