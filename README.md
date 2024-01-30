@@ -30,10 +30,10 @@ the back up of data across AWS services such as Amazon EBS volumes, Amazon EC2 i
 Amazon EFS file systems, and AWS Storage Gateway volumes.
 
 > [!NOTE]  
-> The syntax of declaring a backup schedule has changed as of release 0.14.0, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
+> The syntax of declaring a backup schedule has changed as of release `0.14.0`, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
 
 > [!WARNING]
-> The deprecated variables have been fully deprecated as of 1.0.0. Please use the new variables as described in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
+> The deprecated variables have been fully deprecated as of `1.x.x`. Please use the new variables as described in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
 
 
 ---

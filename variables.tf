@@ -26,7 +26,7 @@ variable "rules" {
     }))
   }))
   description = <<-EOT
-   An array of rule objects used to define schedules in a backup plan. Follows the following structure:
+   A list of rule objects used to define schedules in a backup plan. Follows the following structure:
 
     ```yaml
       rules:
