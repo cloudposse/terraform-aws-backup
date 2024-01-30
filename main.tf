@@ -8,27 +8,6 @@ locals {
   vault_name       = coalesce(var.vault_name, module.this.id)
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default[*].id : data.aws_backup_vault.existing[*].id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default[*].arn : data.aws_backup_vault.existing[*].arn)
-
-  # This is for backwards compatibility
-  single_rule = [{
-    name                     = module.this.id
-    schedule                 = var.schedule
-    start_window             = var.start_window
-    completion_window        = var.completion_window
-    enable_continuous_backup = var.enable_continuous_backup
-    lifecycle = {
-      cold_storage_after = var.cold_storage_after
-      delete_after       = var.delete_after
-    }
-    copy_action = {
-      destination_vault_arn = var.destination_vault_arn
-      lifecycle = {
-        cold_storage_after = var.copy_action_cold_storage_after
-        delete_after       = var.copy_action_delete_after
-      }
-    }
-  }]
-  compatible_rules = length(var.rules) == 0 ? local.single_rule : [{ for k, v in local.single_rule[0] : k => v }]
 }
 
 data "aws_partition" "current" {}
@@ -67,23 +46,23 @@ resource "aws_backup_plan" "default" {
   name  = var.plan_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.plan_name_suffix)
 
   dynamic "rule" {
-    for_each = length(var.rules) > 0 ? var.rules : local.compatible_rules
+    for_each = var.rules
 
     content {
       rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
       target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default[*].name : data.aws_backup_vault.existing[*].name)
-      schedule                 = lookup(rule.value, "schedule", null)
-      start_window             = lookup(rule.value, "start_window", null)
-      completion_window        = lookup(rule.value, "completion_window", null)
+      schedule                 = rule.value.schedule
+      start_window             = rule.value.start_window
+      completion_window        = rule.value.completion_window
       recovery_point_tags      = module.this.tags
-      enable_continuous_backup = lookup(rule.value, "enable_continuous_backup", null)
+      enable_continuous_backup = rule.value.enable_continuous_backup
 
       dynamic "lifecycle" {
         for_each = lookup(rule.value, "lifecycle", null) != null ? [true] : []
 
         content {
-          cold_storage_after = lookup(rule.value.lifecycle, "cold_storage_after", null)
-          delete_after       = lookup(rule.value.lifecycle, "delete_after", null)
+          cold_storage_after = rule.value.lifecycle.cold_storage_after
+          delete_after       = rule.value.lifecycle.delete_after
         }
       }
 
@@ -91,18 +70,27 @@ resource "aws_backup_plan" "default" {
         for_each = try(lookup(rule.value.copy_action, "destination_vault_arn", null), null) != null ? [true] : []
 
         content {
-          destination_vault_arn = lookup(rule.value.copy_action, "destination_vault_arn", null)
+          destination_vault_arn = rule.value.copy_action.destination_vault_arn
 
           dynamic "lifecycle" {
             for_each = lookup(rule.value.copy_action, "lifecycle", null) != null != null ? [true] : []
 
             content {
-              cold_storage_after = lookup(rule.value.copy_action.lifecycle, "cold_storage_after", null)
-              delete_after       = lookup(rule.value.copy_action.lifecycle, "delete_after", null)
+              cold_storage_after = rule.value.copy_action.lifecycle.cold_storage_after
+              delete_after       = rule.value.copy_action.lifecycle.delete_after
             }
           }
         }
       }
+    }
+  }
+
+  dynamic "advanced_backup_setting" {
+    for_each = var.advanced_backup_setting != null ? [true] : []
+
+    content {
+      backup_options = var.advanced_backup_setting.backup_options
+      resource_type  = var.advanced_backup_setting.resource_type
     }
   }
 
