@@ -5,9 +5,53 @@ variable "kms_key_arn" {
 }
 
 variable "rules" {
-  type        = list(any)
-  description = "An array of rule maps used to define schedules in a backup plan"
+  type = list(object({
+    name                     = string
+    schedule                 = optional(string)
+    enable_continuous_backup = optional(bool)
+    start_window             = optional(number)
+    completion_window        = optional(number)
+    lifecycle = optional(object({
+      cold_storage_after                        = optional(number)
+      delete_after                              = optional(number)
+      opt_in_to_archive_for_supported_resources = optional(bool)
+    }))
+    copy_action = optional(object({
+      destination_vault_arn = optional(string)
+      lifecycle = optional(object({
+        cold_storage_after                        = optional(number)
+        delete_after                              = optional(number)
+        opt_in_to_archive_for_supported_resources = optional(bool)
+      }))
+    }))
+  }))
+  description = <<-EOT
+   A list of rule objects used to define schedules in a backup plan. Follows the following structure:
+
+    ```yaml
+      rules:
+        - name: "plan-daily"
+          schedule: "cron(0 5 ? * * *)"
+          start_window: 320 # 60 * 8             # minutes
+          completion_window: 10080 # 60 * 24 * 7 # minutes
+          delete_after: 35 # 7 * 5               # days
+        - name: "plan-weekly"
+          schedule: "cron(0 5 ? * SAT *)"
+          start_window: 320 # 60 * 8              # minutes
+          completion_window: 10080 # 60 * 24 * 7  # minutes
+          delete_after: 90 # 30 * 3
+    ```
+
+    EOT
   default     = []
+}
+
+variable "advanced_backup_setting" {
+  type = object({
+    backup_options = string
+    resource_type  = string
+  })
+  default = null
 }
 
 variable "backup_resources" {

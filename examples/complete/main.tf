@@ -65,20 +65,31 @@ module "backup" {
   context = module.this.context
 }
 
-module "backup_deprecated" {
+module "backup_disabled" {
   source = "../.."
 
-  attributes = ["deprecated"]
+  enabled = false
 
   backup_resources = [module.efs.arn]
   not_resources    = var.not_resources
 
-  name               = "${module.this.name}-daily"
-  schedule           = var.schedule
-  start_window       = var.start_window
-  completion_window  = var.completion_window
-  cold_storage_after = var.cold_storage_after
-  delete_after       = var.delete_after
+  rules = [
+    {
+      name              = "${module.this.name}-daily"
+      schedule          = var.schedule
+      start_window      = var.start_window
+      completion_window = var.completion_window
+      lifecycle = {
+        cold_storage_after = var.cold_storage_after
+        delete_after       = var.delete_after
+      }
+    }
+  ]
+
+  backup_vault_lock_configuration = {
+    max_retention_days = 365
+    min_retention_days = 30
+  }
 
   context = module.this.context
 }
