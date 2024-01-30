@@ -2,10 +2,10 @@ locals {
   enabled          = module.this.enabled
   plan_enabled     = local.enabled && var.plan_enabled
   iam_role_enabled = local.enabled && var.iam_role_enabled
-  iam_role_name    = coalesce(var.iam_role_name, module.label_backup_role.id)
+  iam_role_name    = local.enabled ? coalesce(var.iam_role_name, module.label_backup_role.id) : null
   iam_role_arn     = join("", var.iam_role_enabled ? aws_iam_role.default[*].arn : data.aws_iam_role.existing[*].arn)
   vault_enabled    = local.enabled && var.vault_enabled
-  vault_name       = coalesce(var.vault_name, module.this.id)
+  vault_name       = local.enabled ? coalesce(var.vault_name, module.this.id) : null
   vault_id         = join("", local.vault_enabled ? aws_backup_vault.default[*].id : data.aws_backup_vault.existing[*].id)
   vault_arn        = join("", local.vault_enabled ? aws_backup_vault.default[*].arn : data.aws_backup_vault.existing[*].arn)
 }
