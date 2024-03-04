@@ -28,7 +28,7 @@ module "subnets" {
 
 module "efs" {
   source  = "cloudposse/efs/aws"
-  version = "0.35.0"
+  version = "0.36.0"
 
   region          = var.region
   vpc_id          = module.vpc.vpc_id
