@@ -42,12 +42,17 @@ license: "APACHE2"
 github_repo: cloudposse/terraform-aws-backup
 # Badges to display
 badges:
-  - name: "Latest Release"
-    image: "https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg"
-    url: "https://github.com/cloudposse/terraform-aws-backup/releases/latest"
-  - name: "Slack Community"
-    image: "https://slack.cloudposse.com/badge.svg"
-    url: "https://slack.cloudposse.com"
+  - name: Latest Release
+    image: https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg?style=for-the-badge
+    url: https://github.com/cloudposse/terraform-aws-backup/releases/latest
+  - name: Last Updated
+    image: https://img.shields.io/github/last-commit/cloudposse/terraform-aws-backup.svg?style=for-the-badge
+    url: https://github.com/cloudposse/terraform-aws-backup/commits
+  - name: Slack Community
+    image: https://slack.cloudposse.com/for-the-badge.svg
+    url: https://slack.cloudposse.com
+
+# List any related terraform modules that this module may be used with or that this module depends on.
 related:
   - name: "terraform-aws-efs"
     description: "Terraform module to provision EFS file system"
@@ -64,7 +69,7 @@ description: |-
   Terraform module to provision [AWS Backup](https://aws.amazon.com/backup), a fully managed backup service that makes it easy to centralize and automate
   the back up of data across AWS services such as Amazon EBS volumes, Amazon EC2 instances, Amazon RDS databases, Amazon DynamoDB tables,
   Amazon EFS file systems, and AWS Storage Gateway volumes.
-  
+
   > [!NOTE]  
   > The syntax of declaring a backup schedule has changed as of release `0.14.0`, follow the instructions in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
 
@@ -155,23 +160,23 @@ usage: |2-
     vault_enabled    = var.vault_enabled
     iam_role_enabled = var.iam_role_enabled
     plan_enabled     = var.plan_enabled
-  
+
     selection_tags   = var.selection_tags
     backup_resources = [module.efs.arn]
     not_resources    = var.not_resources
-  
+
     rules = var.rules
-  
+
     kms_key_arn = var.kms_key_arn
-  
+
     advanced_backup_setting         = var.advanced_backup_setting
     backup_vault_lock_configuration = var.backup_vault_lock_configuration
-  
+
   }
   ```
 
   In the above example `var.rules` could be defined as follows:
-  
+
   ```hcl
   rules = [
     {
@@ -186,9 +191,9 @@ usage: |2-
     }
   ]
   ```
-  
+
   or as yaml
-  
+
   ```yaml
   rules:
     - name: "plan-daily"
@@ -205,16 +210,4 @@ include:
   - "docs/terraform.md"
 
 # Contributors to this project
-contributors:
-  - name: "Erik Osterman"
-    homepage: "https://github.com/osterman"
-    github: "osterman"
-  - name: "Andriy Knysh"
-    homepage: "https://github.com/aknysh/"
-    github: "aknysh"
-  - name: "Igor Rodionov"
-    homepage: "https://github.com/goruha/"
-    github: "goruha"
-  - name: "RB"
-    homepage: "https://github.com/nitrocode/"
-    github: "nitrocode"
+contributors: []
