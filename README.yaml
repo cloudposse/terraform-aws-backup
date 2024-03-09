@@ -42,6 +42,9 @@ license: "APACHE2"
 github_repo: cloudposse/terraform-aws-backup
 # Badges to display
 badges:
+  - name: Last Updated
+    image: https://img.shields.io/github/last-commit/cloudposse/terraform-aws-backup.svg?style=for-the-badge
+    url: https://github.com/cloudposse/terraform-aws-backup/commits
   - name: Latest Release
     image: https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg?style=for-the-badge
     url: https://github.com/cloudposse/terraform-aws-backup/releases/latest
