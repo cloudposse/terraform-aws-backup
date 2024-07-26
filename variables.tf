@@ -51,7 +51,8 @@ variable "advanced_backup_setting" {
     backup_options = string
     resource_type  = string
   })
-  default = null
+  description = "An object that specifies backup options for each resource type"
+  default     = null
 }
 
 variable "backup_resources" {

@@ -73,7 +73,7 @@ resource "aws_backup_plan" "default" {
           destination_vault_arn = rule.value.copy_action.destination_vault_arn
 
           dynamic "lifecycle" {
-            for_each = lookup(rule.value.copy_action, "lifecycle", null) != null != null ? [true] : []
+            for_each = lookup(rule.value.copy_action, "lifecycle", null) != null ? [true] : []
 
             content {
               cold_storage_after = rule.value.copy_action.lifecycle.cold_storage_after
