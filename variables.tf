@@ -83,6 +83,12 @@ variable "plan_name_suffix" {
   default     = null
 }
 
+variable "selection_name_suffix" {
+  type        = string
+  description = "The string appended to the selection name"
+  default     = null
+}
+
 variable "vault_name" {
   type        = string
   description = "Override target Vault Name"
