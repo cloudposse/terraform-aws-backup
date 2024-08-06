@@ -132,7 +132,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 
 resource "aws_backup_selection" "default" {
   count         = local.plan_enabled ? 1 : 0
-  name          = substr(join("-", [module.this.id, "backup-selection"]), 0, 50)
+  name          = var.selection_name_suffix == null ? module.this.id : format("%s_%s", module.this.id, var.selection_name_suffix)
   iam_role_arn  = local.iam_role_arn
   plan_id       = join("", aws_backup_plan.default[*].id)
   resources     = var.backup_resources
