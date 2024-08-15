@@ -4,7 +4,7 @@ locals {
   iam_role_enabled       = local.enabled && var.iam_role_enabled
   iam_role_name          = local.enabled ? coalesce(var.iam_role_name, module.label_backup_role.id) : null
   iam_role_arn           = join("", var.iam_role_enabled ? aws_iam_role.default[*].arn : data.aws_iam_role.existing[*].arn)
-  iam_role_serivce_roles = ["AWSBackupServiceRolePolicyForBackup", "AWSBackupServiceRolePolicyForS3Backup"]
+  iam_role_serivce_roles = ["service-role/AWSBackupServiceRolePolicyForBackup", "AWSBackupServiceRolePolicyForS3Backup"]
   vault_enabled          = local.enabled && var.vault_enabled
   vault_name             = local.enabled ? coalesce(var.vault_name, module.this.id) : null
   vault_id               = join("", local.vault_enabled ? aws_backup_vault.default[*].id : data.aws_backup_vault.existing[*].id)
@@ -127,7 +127,7 @@ data "aws_iam_role" "existing" {
 
 resource "aws_iam_role_policy_attachment" "default" {
   for_each   = { for role in local.iam_role_serivce_roles : role => role if local.iam_role_enabled }
-  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/${each.value}"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/${each.value}"
   role       = join("", aws_iam_role.default[*].name)
 }
 
