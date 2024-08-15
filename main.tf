@@ -126,7 +126,7 @@ data "aws_iam_role" "existing" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  for_each = { for role in local.local.iam_role_serivce_roles : role => role if local.iam_role_enabled }
+  for_each   = { for role in local.iam_role_serivce_roles : role => role if local.iam_role_enabled }
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/${each.value}"
   role       = join("", aws_iam_role.default[*].name)
 }
