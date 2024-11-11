@@ -77,6 +77,29 @@ variable "selection_tags" {
   default     = []
 }
 
+variable "selection_conditions" {
+  type = object({
+    string_equals = optional(list(object({
+      key   = string
+      value = string
+    })), [])
+    string_like = optional(list(object({
+      key   = string
+      value = string
+    })), [])
+    string_not_equals = optional(list(object({
+      key   = string
+      value = string
+    })), [])
+    string_not_like = optional(list(object({
+      key   = string
+      value = string
+    })), [])
+  })
+  description = "An array of conditions used to specify a set of resources to assign to a backup plan"
+  default     = {}
+}
+
 variable "plan_name_suffix" {
   type        = string
   description = "The string appended to the plan name"

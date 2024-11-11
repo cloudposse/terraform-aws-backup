@@ -138,12 +138,47 @@ resource "aws_backup_selection" "default" {
   plan_id       = join("", aws_backup_plan.default[*].id)
   resources     = var.backup_resources
   not_resources = var.not_resources
+  
   dynamic "selection_tag" {
     for_each = var.selection_tags
     content {
       type  = selection_tag.value["type"]
       key   = selection_tag.value["key"]
       value = selection_tag.value["value"]
+    }
+  }
+
+  condition {
+    dynamic "string_equals" {
+      for_each = var.selection_conditions.string_equals
+      content {
+        key   = "aws:ResourceTag/${string_equals.value.key}"
+        value = string_equals.value.value
+      }
+    }
+
+    dynamic "string_like" {
+      for_each = var.selection_conditions.string_like
+      content {
+        key   = "aws:ResourceTag/${string_like.value.key}"
+        value = string_like.value.value
+      }
+    }
+
+    dynamic "string_not_equals" {
+      for_each = var.selection_conditions.string_not_equals
+      content {
+        key   = "aws:ResourceTag/${string_not_equals.value.key}"
+        value = string_not_equals.value.value
+      }
+    }
+
+    dynamic "string_not_like" {
+      for_each = var.selection_conditions.string_not_like
+      content {
+        key   = "aws:ResourceTag/${string_not_like.value.key}"
+        value = string_not_like.value.value
+      }
     }
   }
 }
