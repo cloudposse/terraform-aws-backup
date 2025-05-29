@@ -42,9 +42,6 @@ license: "APACHE2"
 github_repo: cloudposse/terraform-aws-backup
 # Badges to display
 badges:
-  - name: Last Updated
-    image: https://img.shields.io/github/last-commit/cloudposse/terraform-aws-backup.svg?style=for-the-badge
-    url: https://github.com/cloudposse/terraform-aws-backup/commits
   - name: Latest Release
     image: https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg?style=for-the-badge
     url: https://github.com/cloudposse/terraform-aws-backup/releases/latest
@@ -53,7 +50,7 @@ badges:
     url: https://github.com/cloudposse/terraform-aws-backup/commits
   - name: Slack Community
     image: https://slack.cloudposse.com/for-the-badge.svg
-    url: https://slack.cloudposse.com
+    url: https://cloudposse.com/slack
 
 # List any related terraform modules that this module may be used with or that this module depends on.
 related:
@@ -208,9 +205,5 @@ usage: |2-
 
 
 
-include:
-  - "docs/targets.md"
-  - "docs/terraform.md"
-
-# Contributors to this project
+include: []
 contributors: []
