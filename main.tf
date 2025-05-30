@@ -138,7 +138,7 @@ resource "aws_backup_selection" "default" {
   plan_id       = join("", aws_backup_plan.default[*].id)
   resources     = var.backup_resources
   not_resources = var.not_resources
-  
+
   dynamic "selection_tag" {
     for_each = var.selection_tags
     content {
