@@ -2,8 +2,11 @@
 
 <!-- markdownlint-disable -->
 <a href="https://cpco.io/homepage"><img src="https://github.com/cloudposse/terraform-aws-backup/blob/main/.github/banner.png?raw=true" alt="Project Banner"/></a><br/>
-    <p align="right">
-<a href="https://github.com/cloudposse/terraform-aws-backup/releases/latest"><img src="https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://github.com/cloudposse/terraform-aws-backup/commits"><img src="https://img.shields.io/github/last-commit/cloudposse/terraform-aws-backup.svg?style=for-the-badge" alt="Last Updated"/></a><a href="https://cloudposse.com/slack"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a></p>
+
+
+<p align="right"><a href="https://github.com/cloudposse/terraform-aws-backup/releases/latest"><img src="https://img.shields.io/github/release/cloudposse/terraform-aws-backup.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://github.com/cloudposse/terraform-aws-backup/commits"><img src="https://img.shields.io/github/last-commit/cloudposse/terraform-aws-backup.svg?style=for-the-badge" alt="Last Updated"/></a><a href="https://cloudposse.com/slack"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a><a href="https://cloudposse.com/support/"><img src="https://img.shields.io/badge/Get_Support-success.svg?style=for-the-badge" alt="Get Support"/></a>
+
+</p>
 <!-- markdownlint-restore -->
 
 <!--
@@ -259,6 +262,7 @@ rules:
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_rules"></a> [rules](#input\_rules) | A list of rule objects used to define schedules in a backup plan. Follows the following structure:<pre>yaml<br/>   rules:<br/>     - name: "plan-daily"<br/>       schedule: "cron(0 5 ? * * *)"<br/>       start_window: 320 # 60 * 8             # minutes<br/>       completion_window: 10080 # 60 * 24 * 7 # minutes<br/>       delete_after: 35 # 7 * 5               # days<br/>     - name: "plan-weekly"<br/>       schedule: "cron(0 5 ? * SAT *)"<br/>       start_window: 320 # 60 * 8              # minutes<br/>       completion_window: 10080 # 60 * 24 * 7  # minutes<br/>       delete_after: 90 # 30 * 3</pre> | <pre>list(object({<br/>    name                     = string<br/>    schedule                 = optional(string)<br/>    enable_continuous_backup = optional(bool)<br/>    start_window             = optional(number)<br/>    completion_window        = optional(number)<br/>    lifecycle = optional(object({<br/>      cold_storage_after                        = optional(number)<br/>      delete_after                              = optional(number)<br/>      opt_in_to_archive_for_supported_resources = optional(bool)<br/>    }))<br/>    copy_action = optional(object({<br/>      destination_vault_arn = optional(string)<br/>      lifecycle = optional(object({<br/>        cold_storage_after                        = optional(number)<br/>        delete_after                              = optional(number)<br/>        opt_in_to_archive_for_supported_resources = optional(bool)<br/>      }))<br/>    }))<br/>  }))</pre> | `[]` | no |
+| <a name="input_selection_conditions"></a> [selection\_conditions](#input\_selection\_conditions) | An array of conditions used to specify a set of resources to assign to a backup plan | <pre>object({<br/>    string_equals = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_like = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_not_equals = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_not_like = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>  })</pre> | `{}` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br/>    type  = string<br/>    key   = string<br/>    value = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `{'BusinessUnit': 'XYZ'}`).<br/>Neither the tag keys nor the tag values will be modified by this module. | `map(string)` | `{}` | no |
@@ -356,7 +360,36 @@ In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
  5. **Push** your work back up to your fork
  6. Submit a **Pull Request** so that we can review your changes
 
-**NOTE:** Be sure to merge the latest changes from "upstream" before making a pull request!
+**NOTE:** Be sure to merge the latest changes from "upstream" before making a pull request!## Running Terraform Tests
+
+We use [Atmos](https://atmos.tools) to streamline how Terraform tests are run. It centralizes configuration and wraps common test workflows with easy-to-use commands.
+
+All tests are located in the [`test/`](test) folder.
+
+Under the hood, tests are powered by Terratest together with our internal [Test Helpers](https://github.com/cloudposse/test-helpers) library, providing robust infrastructure validation.
+
+Setup dependencies:
+- Install Atmos ([installation guide](https://atmos.tools/install/))
+- Install Go [1.24+ or newer](https://go.dev/doc/install)
+- Install Terraform or OpenTofu
+
+To run tests:
+
+- Run all tests:  
+  ```sh
+  atmos test run
+  ```
+- Clean up test artifacts:  
+  ```sh
+  atmos test clean
+  ```
+- Explore additional test options:  
+  ```sh
+  atmos test --help
+  ```
+The configuration for test commands is centrally managed. To review what's being imported, see the [`atmos.yaml`](https://raw.githubusercontent.com/cloudposse/.github/refs/heads/main/.github/atmos/terraform-module.yaml) file.
+
+Learn more about our [automated testing in our documentation](https://docs.cloudposse.com/community/contribute/automated-testing/) or implementing [custom commands](https://atmos.tools/core-concepts/custom-commands/) with atmos.
 
 ### 🌎 Slack Community
 
