@@ -64,7 +64,7 @@ resource "aws_backup_plan" "default" {
         content {
           cold_storage_after                        = rule.value.lifecycle.cold_storage_after
           delete_after                              = rule.value.lifecycle.delete_after
-          opt_in_to_archive_for_supported_resources = rule.value.copy_action.lifecycle.opt_in_to_archive_for_supported_resources
+          opt_in_to_archive_for_supported_resources = rule.value.lifecycle.opt_in_to_archive_for_supported_resources
         }
       }
 
