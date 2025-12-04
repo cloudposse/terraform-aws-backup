@@ -62,8 +62,9 @@ resource "aws_backup_plan" "default" {
         for_each = lookup(rule.value, "lifecycle", null) != null ? [true] : []
 
         content {
-          cold_storage_after = rule.value.lifecycle.cold_storage_after
-          delete_after       = rule.value.lifecycle.delete_after
+          cold_storage_after                        = rule.value.lifecycle.cold_storage_after
+          delete_after                              = rule.value.lifecycle.delete_after
+          opt_in_to_archive_for_supported_resources = rule.value.lifecycle.opt_in_to_archive_for_supported_resources
         }
       }
 
@@ -77,8 +78,9 @@ resource "aws_backup_plan" "default" {
             for_each = lookup(rule.value.copy_action, "lifecycle", null) != null ? [true] : []
 
             content {
-              cold_storage_after = rule.value.copy_action.lifecycle.cold_storage_after
-              delete_after       = rule.value.copy_action.lifecycle.delete_after
+              cold_storage_after                        = rule.value.copy_action.lifecycle.cold_storage_after
+              delete_after                              = rule.value.copy_action.lifecycle.delete_after
+              opt_in_to_archive_for_supported_resources = rule.value.copy_action.lifecycle.opt_in_to_archive_for_supported_resources
             }
           }
         }
