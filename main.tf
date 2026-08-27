@@ -23,10 +23,11 @@ module "label_backup_role" {
 }
 
 resource "aws_backup_vault" "default" {
-  count       = local.vault_enabled ? 1 : 0
-  name        = local.vault_name
-  kms_key_arn = var.kms_key_arn
-  tags        = module.this.tags
+  count         = local.vault_enabled ? 1 : 0
+  name          = local.vault_name
+  kms_key_arn   = var.kms_key_arn
+  force_destroy = var.vault_force_destroy_enabled
+  tags          = module.this.tags
 }
 
 resource "aws_backup_vault_lock_configuration" "default" {

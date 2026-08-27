@@ -118,6 +118,12 @@ variable "vault_enabled" {
   default     = true
 }
 
+variable "vault_force_destroy_enabled" {
+  type        = bool
+  description = "Indicates that all recovery points stored in the vault are deleted so that the vault can be destroyed without error"
+  default     = false
+}
+
 variable "plan_enabled" {
   type        = bool
   description = "Should we create a new Plan"
