@@ -6,11 +6,12 @@ variable "kms_key_arn" {
 
 variable "rules" {
   type = list(object({
-    name                     = string
-    schedule                 = optional(string)
-    enable_continuous_backup = optional(bool)
-    start_window             = optional(number)
-    completion_window        = optional(number)
+    name                         = string
+    schedule                     = optional(string)
+    schedule_expression_timezone = optional(string)
+    enable_continuous_backup     = optional(bool)
+    start_window                 = optional(number)
+    completion_window            = optional(number)
     lifecycle = optional(object({
       cold_storage_after                        = optional(number)
       delete_after                              = optional(number)
@@ -32,11 +33,13 @@ variable "rules" {
       rules:
         - name: "plan-daily"
           schedule: "cron(0 5 ? * * *)"
+          schedule_expression_timezone: "Etc/UTC"
           start_window: 320 # 60 * 8             # minutes
           completion_window: 10080 # 60 * 24 * 7 # minutes
           delete_after: 35 # 7 * 5               # days
         - name: "plan-weekly"
           schedule: "cron(0 5 ? * SAT *)"
+          schedule_expression_timezone: "Etc/UTC"
           start_window: 320 # 60 * 8              # minutes
           completion_window: 10080 # 60 * 24 * 7  # minutes
           delete_after: 90 # 30 * 3

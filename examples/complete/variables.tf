@@ -19,6 +19,11 @@ variable "schedule" {
   description = "A CRON expression specifying when AWS Backup initiates a backup job"
 }
 
+variable "schedule_expression_timezone" {
+  type        = string
+  description = "The timezone in which the schedule expression is set"
+}
+
 variable "start_window" {
   type        = number
   description = "The amount of time in minutes before beginning a backup. Minimum value is 60 minutes"
