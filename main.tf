@@ -51,13 +51,14 @@ resource "aws_backup_plan" "default" {
     for_each = var.rules
 
     content {
-      rule_name                = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
-      target_vault_name        = join("", local.vault_enabled ? aws_backup_vault.default[*].name : data.aws_backup_vault.existing[*].name)
-      schedule                 = rule.value.schedule
-      start_window             = rule.value.start_window
-      completion_window        = rule.value.completion_window
-      recovery_point_tags      = module.this.tags
-      enable_continuous_backup = rule.value.enable_continuous_backup
+      rule_name                    = lookup(rule.value, "name", "${module.this.id}-${rule.key}")
+      target_vault_name            = join("", local.vault_enabled ? aws_backup_vault.default[*].name : data.aws_backup_vault.existing[*].name)
+      schedule                     = rule.value.schedule
+      schedule_expression_timezone = rule.value.schedule_expression_timezone
+      start_window                 = rule.value.start_window
+      completion_window            = rule.value.completion_window
+      recovery_point_tags          = module.this.tags
+      enable_continuous_backup     = rule.value.enable_continuous_backup
 
       dynamic "lifecycle" {
         for_each = lookup(rule.value, "lifecycle", null) != null ? [true] : []

@@ -46,10 +46,11 @@ module "backup" {
 
   rules = [
     {
-      name              = "${module.this.name}-daily"
-      schedule          = var.schedule
-      start_window      = var.start_window
-      completion_window = var.completion_window
+      name                         = "${module.this.name}-daily"
+      schedule                     = var.schedule
+      schedule_expression_timezone = var.schedule_expression_timezone
+      start_window                 = var.start_window
+      completion_window            = var.completion_window
       lifecycle = {
         cold_storage_after = var.cold_storage_after
         delete_after       = var.delete_after

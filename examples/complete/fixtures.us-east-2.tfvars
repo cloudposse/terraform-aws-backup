@@ -12,6 +12,8 @@ name = "backup"
 
 schedule = "cron(0 12 * * ? *)"
 
+schedule_expression_timezone = "Etc/UTC"
+
 start_window = 60
 
 completion_window = 120
