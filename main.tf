@@ -99,6 +99,16 @@ resource "aws_backup_plan" "default" {
     }
   }
 
+  dynamic "scan_setting" {
+    for_each = var.scan_setting != null ? [true] : []
+
+    content {
+      malware_scanner  = var.scan_setting.malware_scanner
+      resource_types   = var.scan_setting.resource_types
+      scanner_role_arn = var.scan_setting.scanner_role_arn
+    }
+  }
+
   tags = module.this.tags
 }
 
