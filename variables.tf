@@ -58,6 +58,37 @@ variable "advanced_backup_setting" {
   default     = null
 }
 
+variable "scan_setting" {
+  type = object({
+    malware_scanner  = optional(string, "GUARDDUTY")
+    resource_types   = list(string)
+    scanner_role_arn = string
+  })
+  description = <<-EOT
+    An object that specifies scan settings for each resource type.
+
+    malware_scanner: Malware scanner to use for the scan setting. Currently only GUARDDUTY is supported.
+    resource_types: List of resource types to apply the scan setting to. Valid values are EBS, EC2, S3 and ALL.
+    scanner_role_arn: ARN of the IAM role that AWS Backup uses to scan resources.
+    EOT
+  default     = null
+
+  validation {
+    condition     = var.scan_setting != null ? alltrue([for resource_type in var.scan_setting.resource_types : contains(["EBS", "EC2", "S3", "ALL"], resource_type)]) : true
+    error_message = "Invalid resource type. Valid values are EBS, EC2, S3 and ALL."
+  }
+
+  validation {
+    condition     = var.scan_setting != null ? contains(["GUARDDUTY"], var.scan_setting.malware_scanner) : true
+    error_message = "Invalid malware scanner. Currently only GUARDDUTY is supported."
+  }
+
+  validation {
+    condition     = var.scan_setting != null ? (var.scan_setting.scanner_role_arn != "") : true
+    error_message = "scanner_role_arn must be provided if scan_setting is not null."
+  }
+}
+
 variable "backup_resources" {
   type        = list(string)
   description = "An array of strings that either contain Amazon Resource Names (ARNs) or match patterns of resources to assign to a backup plan"

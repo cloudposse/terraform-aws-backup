@@ -41,6 +41,7 @@ Amazon EFS file systems, and AWS Storage Gateway volumes.
 > The deprecated variables have been fully deprecated as of `1.x.x`. Please use the new variables as described in the [0.13.x to 0.14.x+ migration guide](./docs/migration-0.13.x-0.14.x+.md).
 
 
+
 > [!TIP]
 > #### 👽 Use Atmos with Terraform
 > Cloud Posse uses [`atmos`](https://atmos.tools) to easily orchestrate multiple environments using Terraform. <br/>
@@ -51,6 +52,7 @@ Amazon EFS file systems, and AWS Storage Gateway volumes.
 > <img src="https://github.com/cloudposse/atmos/blob/main/docs/demo.gif?raw=true"/><br/>
 > <i>Example of running <a href="https://atmos.tools"><code>atmos</code></a> to manage infrastructure from our <a href="https://atmos.tools/quick-start/">Quick Start</a> tutorial.</i>
 > </detalis>
+
 
 
 
@@ -202,13 +204,7 @@ rules:
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.0 |
-
-## Providers
-
-| Name | Version |
-| ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.25 |
 
 ## Modules
 
@@ -262,6 +258,7 @@ rules:
 | <a name="input_plan_name_suffix"></a> [plan\_name\_suffix](#input\_plan\_name\_suffix) | The string appended to the plan name | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_rules"></a> [rules](#input\_rules) | A list of rule objects used to define schedules in a backup plan. Follows the following structure:<pre>yaml<br/>   rules:<br/>     - name: "plan-daily"<br/>       schedule: "cron(0 5 ? * * *)"<br/>       schedule_expression_timezone: "Etc/UTC"<br/>       start_window: 320 # 60 * 8             # minutes<br/>       completion_window: 10080 # 60 * 24 * 7 # minutes<br/>       delete_after: 35 # 7 * 5               # days<br/>     - name: "plan-weekly"<br/>       schedule: "cron(0 5 ? * SAT *)"<br/>       schedule_expression_timezone: "Etc/UTC"<br/>       start_window: 320 # 60 * 8              # minutes<br/>       completion_window: 10080 # 60 * 24 * 7  # minutes<br/>       delete_after: 90 # 30 * 3</pre> | <pre>list(object({<br/>    name                         = string<br/>    schedule                     = optional(string)<br/>    schedule_expression_timezone = optional(string)<br/>    enable_continuous_backup     = optional(bool)<br/>    start_window                 = optional(number)<br/>    completion_window            = optional(number)<br/>    lifecycle = optional(object({<br/>      cold_storage_after                        = optional(number)<br/>      delete_after                              = optional(number)<br/>      opt_in_to_archive_for_supported_resources = optional(bool)<br/>    }))<br/>    copy_action = optional(object({<br/>      destination_vault_arn = optional(string)<br/>      lifecycle = optional(object({<br/>        cold_storage_after                        = optional(number)<br/>        delete_after                              = optional(number)<br/>        opt_in_to_archive_for_supported_resources = optional(bool)<br/>      }))<br/>    }))<br/>  }))</pre> | `[]` | no |
+| <a name="input_scan_setting"></a> [scan\_setting](#input\_scan\_setting) | An object that specifies scan settings for each resource type.<br/><br/>malware\_scanner: Malware scanner to use for the scan setting. Currently only GUARDDUTY is supported.<br/>resource\_types: List of resource types to apply the scan setting to. Valid values are EBS, EC2, S3 and ALL.<br/>scanner\_role\_arn: ARN of the IAM role that AWS Backup uses to scan resources. | <pre>object({<br/>    malware_scanner  = optional(string, "GUARDDUTY")<br/>    resource_types   = list(string)<br/>    scanner_role_arn = string<br/>  })</pre> | `null` | no |
 | <a name="input_selection_conditions"></a> [selection\_conditions](#input\_selection\_conditions) | An array of conditions used to specify a set of resources to assign to a backup plan | <pre>object({<br/>    string_equals = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_like = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_not_equals = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>    string_not_like = optional(list(object({<br/>      key   = string<br/>      value = string<br/>    })), [])<br/>  })</pre> | `{}` | no |
 | <a name="input_selection_tags"></a> [selection\_tags](#input\_selection\_tags) | An array of tag condition objects used to filter resources based on tags for assigning to a backup plan | <pre>list(object({<br/>    type  = string<br/>    key   = string<br/>    value = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
